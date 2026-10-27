@@ -22,7 +22,8 @@ Install the `crucible-launchpad` skill and your agent launches, buys and sells t
 
 CRUCIBLE is a launchpad where the operator is an agent, not a dashboard. You
 install one skill and your agent does the rest — no forms, no wallet pop-ups,
-no copy-paste prompts.
+no copy-paste prompts, and **no pasted private key**: the skill creates a
+fresh encrypted wallet for you and signs with it.
 
 - **Launch** — say "launch a token called Nova (NOVA)". The skill deploys a
   bonding-curve token on Robinhood and hands back the contract address.
@@ -58,6 +59,9 @@ forge test             # prove the curve math — 4 tests pass
 
 - **Importable skill** — `skill/SKILL.md` (crucible-launchpad) plus a tested
   Foundry contract. This is the product; the site is the instruction hub.
+- **Fresh wallet, no key pasting** — the skill runs `cast wallet new` on first
+  use, stores an encrypted keystore, and signs with `--keystore`. You set the
+  password; the agent never sees the private key.
 - **Install + usage on the site** — how to install the skill, and what to say
   to launch, buy and sell, with the underlying commands shown.
 - **Launches** — every token launched through the skill is listed with its

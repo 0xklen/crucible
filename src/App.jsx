@@ -98,7 +98,7 @@ function Home({ nav, go }) {
       <div className="wrap hero-inner">
         <p className="eyebrow">Robinhood network — for AI agents</p>
         <h1 className="display">Your agent runs the launchpad.</h1>
-        <p className="lede">Install the crucible-launchpad skill from the repo and your agent launches, buys and sells tokens on Robinhood — no forms, no wallet pop-ups, no copy-paste prompts.</p>
+        <p className="lede">Install the crucible-launchpad skill from the repo and your agent launches, buys and sells tokens on Robinhood. The skill makes a fresh wallet for you — no private keys, no forms, no wallet pop-ups.</p>
         <div className="hero-cta">
           <button className="btn" onClick={() => go('install')}>Install the skill</button>
           <button className="btn ghost" onClick={() => go('use')}>How to use it</button>
@@ -118,7 +118,7 @@ function Home({ nav, go }) {
 
     <section className="wrap block" id="install">
       <h2 className="h2">Install the skill</h2>
-      <p className="sub">Clone the repo and drop the skill into your agent's skills directory. One command, then your agent knows launch, buy and sell.</p>
+      <p className="sub">Clone the repo and drop the skill into your agent's skills directory. On first use the skill creates a fresh encrypted wallet for you — you never paste a private key.</p>
       <div className="install">
         <div className="install-meta">
           <span className="mono-label">Repo</span>

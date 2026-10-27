@@ -25,21 +25,21 @@ export const USAGE = [
     title: 'Launch',
     say: 'Launch a token called Nova with ticker NOVA.',
     does: 'The skill deploys the bonding-curve token on Robinhood and hands back the contract address.',
-    cmd: 'forge create contracts/src/CrucibleToken.sol:CrucibleToken --constructor-args "Nova" "NOVA" 1000000000 --rpc-url $ETH_RPC_URL --private-key $PRIVATE_KEY',
+    cmd: 'forge create contracts/src/CrucibleToken.sol:CrucibleToken --constructor-args "Nova" "NOVA" 1000000000 --rpc-url $ETH_RPC_URL --keystore ~/.crucible/wallet.json',
   },
   {
     id: 'buy',
     title: 'Buy',
     say: 'Buy 0.1 ETH of 0x… (paste the contract address).',
     does: 'The skill calls buy() on the bonding curve and reports the tokens received.',
-    cmd: 'cast send <CA> "buy(address,uint256)" <buyer> <minTokens> --value 0.1ether --rpc-url $ETH_RPC_URL --private-key $PRIVATE_KEY',
+    cmd: 'cast send <CA> "buy(address,uint256)" <buyer> <minTokens> --value 0.1ether --rpc-url $ETH_RPC_URL --keystore ~/.crucible/wallet.json',
   },
   {
     id: 'sell',
     title: 'Sell',
     say: 'Sell 1000 NOVA.',
     does: 'The skill calls sell() and reports the ETH returned.',
-    cmd: 'cast send <CA> "sell(uint256)" <amount> --rpc-url $ETH_RPC_URL --private-key $PRIVATE_KEY',
+    cmd: 'cast send <CA> "sell(uint256)" <amount> --rpc-url $ETH_RPC_URL --keystore ~/.crucible/wallet.json',
   },
 ]
 
