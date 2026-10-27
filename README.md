@@ -4,7 +4,7 @@
 
 **The launchpad for AI agents.**
 
-Forge tokens and buy on the bonding curve by telling your agent — one prompt, no forms, no wallets.
+Install the `crucible-launchpad` skill and your agent launches, buys and sells tokens on Robinhood.
 
 [![React](https://img.shields.io/badge/React-18-149eca?style=flat-square&logo=react&logoColor=white)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-5-646cff?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev)
@@ -20,31 +20,28 @@ Forge tokens and buy on the bonding curve by telling your agent — one prompt, 
 
 ## What this is
 
-CRUCIBLE is a launchpad where the operator is an agent, not a dashboard.
-Minting a token **and** buying on the bonding curve both happen by telling
-your agent what to do.
+CRUCIBLE is a launchpad where the operator is an agent, not a dashboard. You
+install one skill and your agent does the rest — no forms, no wallet pop-ups,
+no copy-paste prompts.
 
-- **Launch** — tell your agent the name, ticker and supply. It deploys a
-  bonding-curve token on the Robinhood network and hands back the contract
-  address.
-- **Buy** — paste any contract address (CA) to your agent and tell it how much
-  ETH to buy. It buys on the bonding curve and reports the fill.
+- **Launch** — say "launch a token called Nova (NOVA)". The skill deploys a
+  bonding-curve token on Robinhood and hands back the contract address.
+- **Buy** — paste the contract address, say how much ETH. The skill buys on the
+  curve.
+- **Sell** — say "sell 1000 NOVA". The skill sells and returns the ETH.
 
-No connect-wallet, no manual order form, no clicks. The prompt is the whole UI.
-
-## For agents — import this repo
-
-The repo ships real tooling, not just a prompt. Agents install the skill and
-drive the contract directly.
+## Install the skill
 
 ```bash
-# Hermes (or any SKILL.md-based agent): install the skill
-cp -r skill ~/.hermes/skills/crucible
+git clone https://github.com/0xklen/crucible
+cp -r crucible/skill ~/.hermes/skills/crucible-launchpad
 ```
 
-The skill (`skill/SKILL.md`) teaches the agent the exact `forge`/`cast`
-commands to deploy, buy and sell. The contract is a real, tested bonding
-curve:
+Start a new agent session after installing — the skill loads on demand.
+
+The skill (`skill/SKILL.md`) holds every instruction and all the data the agent
+needs: the Robinhood network config, the deploy/buy/sell `forge` and `cast`
+commands, and the pitfalls. It drives a real, tested bonding curve:
 
 - `contracts/src/CrucibleToken.sol` — ERC-20 with `price(n) = K * n`;
   `buy()` mints along the curve, `sell()` burns and refunds.
@@ -57,29 +54,14 @@ forge install          # fetch forge-std (already vendored)
 forge test             # prove the curve math — 4 tests pass
 ```
 
-### Launch
-
-```
-Launch a token on CRUCIBLE: name Nova, ticker NOVA, 1,000,000,000 fixed
-supply, anti-snipe tax on at open. Deploy it on the Robinhood network and
-report the contract address.
-```
-
-### Buy on the curve (paste any CA)
-
-```
-Buy 0.1 ETH of the token at <CONTRACT_ADDRESS> on the CRUCIBLE bonding curve
-on the Robinhood network. Report the tokens received and the price paid.
-```
-
 ## Features
 
-- **Free-form CA input** — the buy flow accepts any contract address you paste,
-  not just the sample tokens.
-- **Prompt builders** — type a name/ticker (launch) or a CA + amount (buy),
-  get a ready-to-paste prompt with one-click copy.
-- **Agent roster** — Hermes, Claude Code, Codex, Cursor, OpenCode, or any agent.
-- **Importable skill** — `skill/SKILL.md` plus a tested Foundry contract.
+- **Importable skill** — `skill/SKILL.md` (crucible-launchpad) plus a tested
+  Foundry contract. This is the product; the site is the instruction hub.
+- **Install + usage on the site** — how to install the skill, and what to say
+  to launch, buy and sell, with the underlying commands shown.
+- **Launches** — every token launched through the skill is listed with its
+  contract address and one-click copy.
 - **The machines** — three embedded isometric figures (The Press, The Vending
   Machine, The Vault) drawn by the Colorfigures engine: mint → sell → graduate.
 - **Paper/ink theme** — plain warm-paper background in the machines' own palette.
@@ -106,10 +88,10 @@ npm run build        # production build -> dist/
 
 ```
 crucible/
-├── src/               React app (Vite)
+├── src/               React app (Vite) — the instruction hub
 ├── public/            logo, machine figures
 ├── contracts/         Foundry: bonding-curve token + tests + deploy script
-├── skill/             SKILL.md — the agent-importable tooling
+├── skill/             SKILL.md — crucible-launchpad, the agent tooling
 ├── scripts/           gen_logo.py (reproduces the mark)
 └── docs/              screenshot
 ```

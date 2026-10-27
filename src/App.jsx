@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { LAUNCHES, MACHINES, CHAIN, AGENTS, LAUNCH_PROMPT, BUY_PROMPT } from './data.js'
+import { LAUNCHES, MACHINES, CHAIN, SKILL, USAGE } from './data.js'
 
 const fmt = n => {
   if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B'
@@ -58,6 +58,13 @@ function CopyButton({ text }) {
   return <button className={'copy' + (copied ? ' on' : '')} onClick={copy}>{copied ? 'Copied' : 'Copy'}</button>
 }
 
+function CodeBlock({ text }) {
+  return <div className="code-block">
+    <pre>{text}</pre>
+    <CopyButton text={text} />
+  </div>
+}
+
 function CaRow({ ca }) {
   return <div className="ca-row">
     <span className="ca-label">CA</span>
@@ -84,38 +91,17 @@ function LaunchCard({ l, nav }) {
   </button>
 }
 
-function BuyPanel({ ca, setCa, amount, setAmount }) {
-  const prompt = BUY_PROMPT(ca, amount)
-  return <div className="prompt-hero">
-    <label className="ca-field">Contract address — paste any token's CA
-      <input value={ca} onChange={e => setCa(e.target.value)} placeholder="0x…" spellCheck={false} autoComplete="off" />
-    </label>
-    <label className="amt">Amount in ETH
-      <input value={amount} onChange={e => setAmount(e.target.value)} inputMode="decimal" placeholder="0.1" />
-    </label>
-    <p className="prompt-text">{prompt}</p>
-    <div className="prompt-actions"><CopyButton text={prompt} /></div>
-  </div>
-}
-
 function Home({ nav, go }) {
   const featured = LAUNCHES.slice(0, 4)
-  const [name, setName] = useState('')
-  const [ticker, setTicker] = useState('')
-  const [buyId, setBuyId] = useState(LAUNCHES[0].id)
-  const [ca, setCa] = useState(LAUNCHES[0].ca)
-  const [amount, setAmount] = useState('0.1')
-  const launchPrompt = LAUNCH_PROMPT(name, ticker)
-
   return <>
     <section className="hero">
       <div className="wrap hero-inner">
         <p className="eyebrow">Robinhood network — for AI agents</p>
-        <h1 className="display">Forge and trade tokens with your agent.</h1>
-        <p className="lede">CRUCIBLE is the launchpad for AI agents. Tell Hermes, Claude or Codex what to launch, or paste a contract address and tell your agent to buy on the bonding curve — no forms, no wallets, no clicks.</p>
+        <h1 className="display">Your agent runs the launchpad.</h1>
+        <p className="lede">Install the crucible-launchpad skill from the repo and your agent launches, buys and sells tokens on Robinhood — no forms, no wallet pop-ups, no copy-paste prompts.</p>
         <div className="hero-cta">
-          <button className="btn" onClick={() => go('launch')}>Launch a token</button>
-          <button className="btn ghost" onClick={() => go('buy')}>Buy on the curve</button>
+          <button className="btn" onClick={() => go('install')}>Install the skill</button>
+          <button className="btn ghost" onClick={() => go('use')}>How to use it</button>
         </div>
       </div>
       <div className="wrap hero-fig">
@@ -124,79 +110,45 @@ function Home({ nav, go }) {
     </section>
 
     <section className="strip wrap">
-      <div className="stat"><b>{AGENTS.length}</b><span>agents supported</span></div>
-      <div className="stat"><b>{LAUNCHES.length}</b><span>tokens forged</span></div>
+      <div className="stat"><b>1</b><span>skill to install</span></div>
+      <div className="stat"><b>{LAUNCHES.length}</b><span>tokens launched</span></div>
       <div className="stat"><b>{CHAIN.name}</b><span>network</span></div>
       <div className="stat"><b>{CHAIN.id}</b><span>chain id</span></div>
     </section>
 
-    <section className="wrap block" id="how">
-      <h2 className="h2">Two things your agent can do</h2>
-      <p className="sub">Launch a token, or buy one. Both are one prompt pasted into your agent.</p>
-      <div className="flows">
-        <div className="flow-card">
-          <span className="flow-tag">Launch</span>
-          <h3>Mint a token</h3>
-          <ol>
-            <li>Tell your agent the name, ticker and supply.</li>
-            <li>It deploys the token on Robinhood.</li>
-            <li>It hands you back the contract address.</li>
-          </ol>
-          <button className="btn ghost" onClick={() => go('launch')}>Build the prompt</button>
+    <section className="wrap block" id="install">
+      <h2 className="h2">Install the skill</h2>
+      <p className="sub">Clone the repo and drop the skill into your agent's skills directory. One command, then your agent knows launch, buy and sell.</p>
+      <div className="install">
+        <div className="install-meta">
+          <span className="mono-label">Repo</span>
+          <a className="link" href={SKILL.repo} target="_blank" rel="noopener">{SKILL.repo.replace('https://', '')}</a>
+          <span className="mono-label">Skill</span>
+          <b>{SKILL.name}</b>
         </div>
-        <div className="flow-card">
-          <span className="flow-tag">Buy</span>
-          <h3>Buy on the curve</h3>
-          <ol>
-            <li>Paste the contract address to your agent.</li>
-            <li>Tell it how much ETH to buy.</li>
-            <li>It buys on the bonding curve and reports the fill.</li>
-          </ol>
-          <button className="btn ghost" onClick={() => go('buy')}>Build the prompt</button>
-        </div>
+        <CodeBlock text={SKILL.install} />
+        <p className="hint">Start a new agent session after installing — the skill loads on demand.</p>
       </div>
     </section>
 
-    <section className="wrap block" id="launch">
-      <h2 className="h2">Launch a token</h2>
-      <p className="sub">Fill the blanks, copy, paste into your agent. That is the whole launch flow.</p>
-      <div className="builder">
-        <div className="builder-fields">
-          <label>Name<input value={name} onChange={e => setName(e.target.value)} placeholder="Nova" /></label>
-          <label>Ticker<input value={ticker} onChange={e => setTicker(e.target.value)} placeholder="NOVA" maxLength={8} /></label>
-        </div>
-        <div className="prompt-hero">
-          <p className="prompt-text">{launchPrompt}</p>
-          <div className="prompt-actions"><CopyButton text={launchPrompt} /></div>
-        </div>
-      </div>
-      <div className="agents">
-        {AGENTS.map(a => (
-          <div className="agent-card" key={a.id}>
-            <h3>{a.name}</h3>
-            <p className="by">by {a.by}</p>
-            <p className="agent-line">Open {a.name}, paste the prompt, fill the blanks, send.</p>
+    <section className="wrap block" id="use">
+      <h2 className="h2">Launch, buy, sell</h2>
+      <p className="sub">Say it in plain language. The skill runs the command underneath.</p>
+      <div className="usage">
+        {USAGE.map(u => (
+          <div className="usage-card" key={u.id}>
+            <h3>{u.title}</h3>
+            <p className="say"><b>Say:</b> “{u.say}”</p>
+            <p className="does">{u.does}</p>
+            <CodeBlock text={u.cmd} />
           </div>
         ))}
       </div>
     </section>
 
-    <section className="wrap block" id="buy">
-      <h2 className="h2">Buy with your agent</h2>
-      <p className="sub">Pick a token, copy its contract address, and paste the buy prompt into your agent. Buying only ever happens through an agent.</p>
-      <div className="buy-picker">
-        {featured.map(l => (
-          <button key={l.id} className={'chip' + (buyId === l.id ? ' on' : '')} onClick={() => { setBuyId(l.id); setCa(l.ca) }}>
-            <span className="chip-dot" style={{ background: l.color }} />{l.symbol}
-          </button>
-        ))}
-      </div>
-      <BuyPanel ca={ca} setCa={setCa} amount={amount} setAmount={setAmount} />
-    </section>
-
     <section className="wrap block" id="launches">
       <div className="section-head">
-        <h2 className="h2">On the curve</h2>
+        <h2 className="h2">Launched with the skill</h2>
         <span className="sample">sample data</span>
       </div>
       <div className="grid">
@@ -226,7 +178,7 @@ function Launches({ nav }) {
   return <section className="wrap page">
     <button className="link back" onClick={() => nav('#/')}>← Home</button>
     <h1 className="display">Launches</h1>
-    <p className="lede">Every token here was forged by an agent on the Robinhood network. Figures are sample data for the demo.</p>
+    <p className="lede">Every token here was launched through the crucible-launchpad skill on the Robinhood network. Figures are sample data for the demo.</p>
     <div className="grid">
       {LAUNCHES.map(l => <LaunchCard key={l.id} l={l} nav={nav} />)}
     </div>
@@ -235,9 +187,9 @@ function Launches({ nav }) {
 
 function Token({ id, nav }) {
   const l = LAUNCHES.find(x => x.id === id)
-  const [amount, setAmount] = useState('0.1')
-  const [ca, setCa] = useState(l ? l.ca : '')
   if (!l) return <section className="wrap page"><h1 className="display">Not found</h1><button className="link" onClick={() => nav('#/launches')}>← Back</button></section>
+  const buyCmd = USAGE.find(u => u.id === 'buy').cmd.replace('<CA>', l.ca)
+  const sellCmd = USAGE.find(u => u.id === 'sell').cmd.replace('<CA>', l.ca)
   return <section className="wrap page">
     <button className="link back" onClick={() => nav('#/launches')}>← All launches</button>
     <div className="coin-head">
@@ -245,23 +197,24 @@ function Token({ id, nav }) {
       <div className="coin-title">
         <h1>{l.name} <small>{l.symbol}</small></h1>
         <p className="coin-desc">{l.desc}</p>
-        <p className="sub">forged by {l.agent} · supply {l.supply} · on {CHAIN.name}</p>
+        <p className="sub">launched by {l.agent} · supply {l.supply} · on {CHAIN.name}</p>
       </div>
-    </div>
-    <div className="panel buy-panel">
-      <h3>Buy with your agent</h3>
-      <BuyPanel ca={ca} setCa={setCa} amount={amount} setAmount={setAmount} />
     </div>
     <div className="panel detail-panel">
       <CaRow ca={l.ca} />
       <div className="drow"><span>Total supply</span><b>{l.supply}</b></div>
       <div className="drow"><span>Market cap</span><b>{fmt(l.mcap)}</b></div>
       <div className="drow"><span>Holders</span><b>{l.holders.toLocaleString()}</b></div>
-      <div className="drow"><span>Forged by</span><b>{l.agent}</b></div>
+      <div className="drow"><span>Launched by</span><b>{l.agent}</b></div>
+    </div>
+    <div className="panel grad-panel">
+      <h3>Buy or sell with the skill</h3>
+      <p className="sub">Your agent runs these on Robinhood using the crucible-launchpad skill.</p>
+      <CodeBlock text={buyCmd} />
+      <CodeBlock text={sellCmd} />
     </div>
     <div className="panel grad-panel">
       <h3>Graduation → {CHAIN.dex}</h3>
-      <p className="sub">When the curve completes, liquidity locks and seeds a Robinhood DEX pool.</p>
       <div className="bar"><i style={{ width: l.progress + '%', background: l.color }} /></div>
       <div className="card-foot"><span>curve progress</span><b>{l.progress}%</b></div>
     </div>
@@ -292,7 +245,7 @@ export default function App() {
           <img src="/logo.svg" alt="" width="22" height="22" /> CRUCIBLE
         </button>
         <nav>
-          {[['launch', 'Launch'], ['buy', 'Buy'], ['launches', 'Launches'], ['machines', 'Machines']].map(([k, label]) =>
+          {[['install', 'Install'], ['use', 'How to use'], ['launches', 'Launches'], ['machines', 'Machines']].map(([k, label]) =>
             <button key={k} onClick={() => go(k)}>{label}</button>)}
         </nav>
         <span className="chain-chip">{CHAIN.name} {CHAIN.id}</span>
@@ -303,11 +256,11 @@ export default function App() {
       <div className="wrap foot-inner">
         <div className="foot-brand">
           <p className="fbrand"><img src="/logo.svg" alt="" /> CRUCIBLE</p>
-          <p className="fline">The launchpad for AI agents.<br />Forge and trade on the Robinhood network.</p>
+          <p className="fline">The launchpad for AI agents.<br />Install the skill, forge and trade on Robinhood.</p>
         </div>
         <div className="foot-col">
           <h4>Launchpad</h4>
-          {[['Launch', 'launch'], ['Buy', 'buy'], ['Launches', 'launches'], ['Machines', 'machines']].map(([label, id]) =>
+          {[['Install', 'install'], ['How to use', 'use'], ['Launches', 'launches'], ['Machines', 'machines']].map(([label, id]) =>
             <button key={id} onClick={() => go(id)}>{label}</button>)}
         </div>
         <div className="foot-col">
@@ -317,8 +270,9 @@ export default function App() {
           <span>gas {CHAIN.gas}</span>
         </div>
         <div className="foot-col">
-          <h4>Agents</h4>
-          <span>{AGENTS.map(a => a.name).join(', ')}</span>
+          <h4>Skill</h4>
+          <span>{SKILL.name}</span>
+          <a className="link" href={SKILL.repo} target="_blank" rel="noopener">github.com/0xklen/crucible</a>
         </div>
       </div>
       <div className="foot-bar">

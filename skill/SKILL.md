@@ -1,16 +1,16 @@
 ---
-name: crucible
-description: Launch and buy bonding-curve tokens on the Robinhood network.
+name: crucible-launchpad
+description: Launch, buy and sell bonding-curve tokens on Robinhood.
 version: 0.1.0
 author: Jay (0xklen), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
   hermes:
-    tags: [crucible, bonding-curve, robinhood, token-launch, foundry, defi]
+    tags: [crucible, launchpad, bonding-curve, robinhood, token-launch, foundry, defi]
 ---
 
-# Crucible
+# Crucible Launchpad
 
 CRUCIBLE is the launchpad for AI agents: tokens are minted and bought on a
 linear bonding curve on the Robinhood network, driven entirely by an agent —

@@ -1,8 +1,8 @@
-// CRUCIBLE — the launchpad for AI agents. Agents forge tokens on the
-// Robinhood network (chainId 4663) and buy on the bonding curve, all by
-// telling their own agent what to do. One prompt, no forms, no clicks.
-// All launch figures and contract addresses below are SAMPLE data — the
-// demo has no live backend.
+// CRUCIBLE — the launchpad for AI agents. The user installs the
+// `crucible-launchpad` skill from the repo and their agent runs launch,
+// buy and sell on the Robinhood network (chainId 4663) directly.
+// Launch figures and contract addresses below are SAMPLE data — the demo
+// has no live backend.
 
 export const CHAIN = {
   id: 4663,
@@ -12,27 +12,39 @@ export const CHAIN = {
   rpc: 'https://rpc.mainnet.chain.robinhood.com',
 }
 
-// The agents you can tell.
-export const AGENTS = [
-  { id: 'hermes', name: 'Hermes', by: 'Nous Research' },
-  { id: 'claude', name: 'Claude Code', by: 'Anthropic' },
-  { id: 'codex', name: 'Codex', by: 'OpenAI' },
-  { id: 'cursor', name: 'Cursor', by: 'Anysphere' },
-  { id: 'opencode', name: 'OpenCode', by: 'SST' },
-  { id: 'any', name: 'Any agent', by: 'agent-agnostic' },
+export const SKILL = {
+  name: 'crucible-launchpad',
+  repo: 'https://github.com/0xklen/crucible',
+  install: `git clone https://github.com/0xklen/crucible\ncp -r crucible/skill ~/.hermes/skills/crucible-launchpad`,
+}
+
+// What you say to your agent, and the command the skill runs underneath.
+export const USAGE = [
+  {
+    id: 'launch',
+    title: 'Launch',
+    say: 'Launch a token called Nova with ticker NOVA.',
+    does: 'The skill deploys the bonding-curve token on Robinhood and hands back the contract address.',
+    cmd: 'forge create contracts/src/CrucibleToken.sol:CrucibleToken --constructor-args "Nova" "NOVA" 1000000000 --rpc-url $ETH_RPC_URL --private-key $PRIVATE_KEY',
+  },
+  {
+    id: 'buy',
+    title: 'Buy',
+    say: 'Buy 0.1 ETH of 0x… (paste the contract address).',
+    does: 'The skill calls buy() on the bonding curve and reports the tokens received.',
+    cmd: 'cast send <CA> "buy(address,uint256)" <buyer> <minTokens> --value 0.1ether --rpc-url $ETH_RPC_URL --private-key $PRIVATE_KEY',
+  },
+  {
+    id: 'sell',
+    title: 'Sell',
+    say: 'Sell 1000 NOVA.',
+    does: 'The skill calls sell() and reports the ETH returned.',
+    cmd: 'cast send <CA> "sell(uint256)" <amount> --rpc-url $ETH_RPC_URL --private-key $PRIVATE_KEY',
+  },
 ]
 
-// LAUNCH — the prompt that mints a token. Fill the blanks, paste, done.
-export const LAUNCH_PROMPT = (name, ticker) =>
-  `Launch a token on CRUCIBLE: name ${name || '<NAME>'}, ticker ${ticker || '<TICKER>'}, 1,000,000,000 fixed supply, anti-snipe tax on at open. Deploy it on the Robinhood network and report the contract address.`
-
-// BUY — the prompt that buys on the bonding curve, keyed off the contract
-// address (CA) the launch returned.
-export const BUY_PROMPT = (ca, amountEth) =>
-  `Buy ${amountEth} ETH of the token at ${ca} on the CRUCIBLE bonding curve on the Robinhood network. Report the tokens received and the price paid.`
-
-// Sample token launches. `ca` is the contract address the launching agent
-// returned; it is what a buyer pastes to their own agent to buy.
+// Sample launches made through the skill. `ca` is the contract address the
+// launching agent returned; a buyer pastes it to their own agent to buy.
 export const LAUNCHES = [
   { id: 'nova', name: 'Nova', symbol: 'NOVA', color: '#e2483d', agent: 'Hermes',
     ca: '0x9f3c2a7e4b5d8f1a6c0e9b2d3f4a5b6c7d8e9f0',
