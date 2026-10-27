@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { LAUNCHES, MACHINES, CHAIN, AGENTS, PROMPT } from './data.js'
+import { LAUNCHES, MACHINES, CHAIN, AGENTS, LAUNCH_PROMPT, BUY_PROMPT } from './data.js'
 
 const fmt = n => {
   if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B'
@@ -7,6 +7,8 @@ const fmt = n => {
   if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K'
   return '$' + n
 }
+
+const shortCa = a => (a ? a.slice(0, 6) + '…' + a.slice(-4) : '')
 
 function useHash() {
   const [h, setH] = useState(location.hash || '#/')
@@ -18,7 +20,7 @@ function useHash() {
   return h
 }
 
-function Machine({ file, title, mref }) {
+function Machine({ file, title }) {
   if (!file) {
     return <div className="mach placeholder">
       <div className="mach-mark">✦</div>
@@ -26,7 +28,7 @@ function Machine({ file, title, mref }) {
     </div>
   }
   return <div className="mach">
-    <iframe ref={mref} src={file} title={title} loading="lazy" />
+    <iframe src={file} title={title} loading="lazy" />
   </div>
 }
 
@@ -42,21 +44,26 @@ function CopyButton({ text }) {
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1600)
     } catch (e) {
-      // clipboard unavailable (non-secure context) — select the text instead
       const el = document.createElement('textarea')
       el.value = text
       document.body.appendChild(el)
       el.select()
       try { document.execCommand('copy') } catch (e2) {}
       document.body.removeChild(el)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1600)
     }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1600)
   }
-  return <button className={'copy' + (copied ? ' on' : '')} onClick={copy}>{copied ? 'Copied' : 'Copy prompt'}</button>
+  return <button className={'copy' + (copied ? ' on' : '')} onClick={copy}>{copied ? 'Copied' : 'Copy'}</button>
+}
+
+function CaRow({ ca }) {
+  return <div className="ca-row">
+    <span className="ca-label">CA</span>
+    <code className="ca">{ca}</code>
+    <CopyButton text={ca} />
+  </div>
 }
 
 function LaunchCard({ l, nav }) {
@@ -73,20 +80,40 @@ function LaunchCard({ l, nav }) {
     </div>
     <div className="bar"><i style={{ width: l.progress + '%', background: l.color }} /></div>
     <div className="card-foot"><span>bonding curve</span><b>{l.progress}%</b></div>
+    <div className="card-ca">CA {shortCa(l.ca)}</div>
   </button>
+}
+
+function BuyPanel({ token, amount, setAmount }) {
+  const prompt = BUY_PROMPT(token.ca, amount)
+  return <div className="prompt-hero">
+    <CaRow ca={token.ca} />
+    <label className="amt">Amount in ETH
+      <input value={amount} onChange={e => setAmount(e.target.value)} inputMode="decimal" placeholder="0.1" />
+    </label>
+    <p className="prompt-text">{prompt}</p>
+    <div className="prompt-actions"><CopyButton text={prompt} /></div>
+  </div>
 }
 
 function Home({ nav, go }) {
   const featured = LAUNCHES.slice(0, 4)
+  const [name, setName] = useState('')
+  const [ticker, setTicker] = useState('')
+  const [buyId, setBuyId] = useState(LAUNCHES[0].id)
+  const [amount, setAmount] = useState('0.1')
+  const launchPrompt = LAUNCH_PROMPT(name, ticker)
+  const buyToken = LAUNCHES.find(x => x.id === buyId)
+
   return <>
     <section className="hero">
       <div className="wrap hero-inner">
         <p className="eyebrow">Robinhood network — for AI agents</p>
-        <h1 className="display">Forge tokens with your agent.</h1>
-        <p className="lede">CRUCIBLE is the launchpad for AI agents. Tell Hermes, Claude or Codex what to forge and it strikes the token on the Robinhood network — one prompt, no forms, no clicks.</p>
+        <h1 className="display">Forge and trade tokens with your agent.</h1>
+        <p className="lede">CRUCIBLE is the launchpad for AI agents. Tell Hermes, Claude or Codex what to launch, or paste a contract address and tell your agent to buy on the bonding curve — no forms, no wallets, no clicks.</p>
         <div className="hero-cta">
-          <button className="btn" onClick={() => go('agents')}>See the prompts</button>
-          <button className="btn ghost" onClick={() => go('launches')}>Live launches</button>
+          <button className="btn" onClick={() => go('launch')}>Launch a token</button>
+          <button className="btn ghost" onClick={() => go('buy')}>Buy on the curve</button>
         </div>
       </div>
       <div className="wrap hero-fig">
@@ -102,33 +129,44 @@ function Home({ nav, go }) {
     </section>
 
     <section className="wrap block" id="how">
-      <h2 className="h2">How it works</h2>
-      <p className="sub">No dashboard, no wallet pop-ups. The launchpad lives inside your agent.</p>
-      <div className="steps">
-        <div className="step">
-          <span className="step-n">1</span>
-          <h3>Choose your agent</h3>
-          <p>Hermes, Claude Code, Codex, Cursor, OpenCode — or any agent that can sign a transaction on Robinhood.</p>
+      <h2 className="h2">Two things your agent can do</h2>
+      <p className="sub">Launch a token, or buy one. Both are one prompt pasted into your agent.</p>
+      <div className="flows">
+        <div className="flow-card">
+          <span className="flow-tag">Launch</span>
+          <h3>Mint a token</h3>
+          <ol>
+            <li>Tell your agent the name, ticker and supply.</li>
+            <li>It deploys the token on Robinhood.</li>
+            <li>It hands you back the contract address.</li>
+          </ol>
+          <button className="btn ghost" onClick={() => go('launch')}>Build the prompt</button>
         </div>
-        <div className="step">
-          <span className="step-n">2</span>
-          <h3>Tell it what to forge</h3>
-          <p>Name, ticker, supply. One sentence is the whole brief. The agent does the rest.</p>
-        </div>
-        <div className="step">
-          <span className="step-n">3</span>
-          <h3>It strikes on Robinhood</h3>
-          <p>The agent deploys the token to the Robinhood network and hands you back the contract address.</p>
+        <div className="flow-card">
+          <span className="flow-tag">Buy</span>
+          <h3>Buy on the curve</h3>
+          <ol>
+            <li>Paste the contract address to your agent.</li>
+            <li>Tell it how much ETH to buy.</li>
+            <li>It buys on the bonding curve and reports the fill.</li>
+          </ol>
+          <button className="btn ghost" onClick={() => go('buy')}>Build the prompt</button>
         </div>
       </div>
     </section>
 
-    <section className="wrap block" id="agents">
-      <h2 className="h2">Launch prompts</h2>
-      <p className="sub">Copy a prompt, paste it into your agent, replace <span className="kbd">NAME</span> and <span className="kbd">TICKER</span>. That is the whole launch flow.</p>
-      <div className="prompt-hero">
-        <p className="prompt-text">{PROMPT}</p>
-        <div className="prompt-actions"><CopyButton text={PROMPT} /></div>
+    <section className="wrap block" id="launch">
+      <h2 className="h2">Launch a token</h2>
+      <p className="sub">Fill the blanks, copy, paste into your agent. That is the whole launch flow.</p>
+      <div className="builder">
+        <div className="builder-fields">
+          <label>Name<input value={name} onChange={e => setName(e.target.value)} placeholder="Nova" /></label>
+          <label>Ticker<input value={ticker} onChange={e => setTicker(e.target.value)} placeholder="NOVA" maxLength={8} /></label>
+        </div>
+        <div className="prompt-hero">
+          <p className="prompt-text">{launchPrompt}</p>
+          <div className="prompt-actions"><CopyButton text={launchPrompt} /></div>
+        </div>
       </div>
       <div className="agents">
         {AGENTS.map(a => (
@@ -139,6 +177,19 @@ function Home({ nav, go }) {
           </div>
         ))}
       </div>
+    </section>
+
+    <section className="wrap block" id="buy">
+      <h2 className="h2">Buy with your agent</h2>
+      <p className="sub">Pick a token, copy its contract address, and paste the buy prompt into your agent. Buying only ever happens through an agent.</p>
+      <div className="buy-picker">
+        {featured.map(l => (
+          <button key={l.id} className={'chip' + (buyId === l.id ? ' on' : '')} onClick={() => setBuyId(l.id)}>
+            <span className="chip-dot" style={{ background: l.color }} />{l.symbol}
+          </button>
+        ))}
+      </div>
+      <BuyPanel token={buyToken} amount={amount} setAmount={setAmount} />
     </section>
 
     <section className="wrap block" id="launches">
@@ -182,6 +233,7 @@ function Launches({ nav }) {
 
 function Token({ id, nav }) {
   const l = LAUNCHES.find(x => x.id === id)
+  const [amount, setAmount] = useState('0.1')
   if (!l) return <section className="wrap page"><h1 className="display">Not found</h1><button className="link" onClick={() => nav('#/launches')}>← Back</button></section>
   return <section className="wrap page">
     <button className="link back" onClick={() => nav('#/launches')}>← All launches</button>
@@ -193,11 +245,15 @@ function Token({ id, nav }) {
         <p className="sub">forged by {l.agent} · supply {l.supply} · on {CHAIN.name}</p>
       </div>
     </div>
+    <div className="panel buy-panel">
+      <h3>Buy with your agent</h3>
+      <BuyPanel token={l} amount={amount} setAmount={setAmount} />
+    </div>
     <div className="panel detail-panel">
+      <div className="drow"><span>Contract address</span><b>{l.ca}</b></div>
       <div className="drow"><span>Total supply</span><b>{l.supply}</b></div>
       <div className="drow"><span>Market cap</span><b>{fmt(l.mcap)}</b></div>
       <div className="drow"><span>Holders</span><b>{l.holders.toLocaleString()}</b></div>
-      <div className="drow"><span>Created</span><b>{l.created}</b></div>
       <div className="drow"><span>Forged by</span><b>{l.agent}</b></div>
     </div>
     <div className="panel grad-panel">
@@ -233,7 +289,7 @@ export default function App() {
           <img src="/logo.svg" alt="" width="22" height="22" /> CRUCIBLE
         </button>
         <nav>
-          {[['how', 'How it works'], ['agents', 'Agents'], ['launches', 'Launches'], ['machines', 'Machines']].map(([k, label]) =>
+          {[['launch', 'Launch'], ['buy', 'Buy'], ['launches', 'Launches'], ['machines', 'Machines']].map(([k, label]) =>
             <button key={k} onClick={() => go(k)}>{label}</button>)}
         </nav>
         <span className="chain-chip">{CHAIN.name} {CHAIN.id}</span>
@@ -244,11 +300,11 @@ export default function App() {
       <div className="wrap foot-inner">
         <div className="foot-brand">
           <p className="fbrand"><img src="/logo.svg" alt="" /> CRUCIBLE</p>
-          <p className="fline">The launchpad for AI agents.<br />Forge your token on the Robinhood network.</p>
+          <p className="fline">The launchpad for AI agents.<br />Forge and trade on the Robinhood network.</p>
         </div>
         <div className="foot-col">
           <h4>Launchpad</h4>
-          {[['How it works', 'how'], ['Agents', 'agents'], ['Launches', 'launches'], ['Machines', 'machines']].map(([label, id]) =>
+          {[['Launch', 'launch'], ['Buy', 'buy'], ['Launches', 'launches'], ['Machines', 'machines']].map(([label, id]) =>
             <button key={id} onClick={() => go(id)}>{label}</button>)}
         </div>
         <div className="foot-col">
