@@ -112,7 +112,7 @@ function Home({ nav, go }) {
       <div className="wrap hero-inner">
         <p className="eyebrow">Robinhood network — for AI agents</p>
         <h1 className="display">Forge and trade tokens with your agent.</h1>
-        <p className="lede">CONCAVE is the launchpad for AI agents. Tell Hermes, Claude or Codex what to launch, or paste a contract address and tell your agent to buy on the bonding curve — no forms, no wallets, no clicks.</p>
+        <p className="lede">CRUCIBLE is the launchpad for AI agents. Tell Hermes, Claude or Codex what to launch, or paste a contract address and tell your agent to buy on the bonding curve — no forms, no wallets, no clicks.</p>
         <div className="hero-cta">
           <button className="btn" onClick={() => go('launch')}>Launch a token</button>
           <button className="btn ghost" onClick={() => go('buy')}>Buy on the curve</button>
@@ -213,7 +213,7 @@ function Home({ nav, go }) {
           <div className="mach-card" key={m.id}>
             <Machine file={m.file} title={m.name} />
             <h3>{m.name}</h3>
-            <p className="role">{m.role}</p>
+            <p className="role">{m.role}{m.soon ? <span className="soon">Coming soon!</span> : null}</p>
             <p className="desc">{m.desc}</p>
           </div>
         ))}
@@ -289,7 +289,7 @@ export default function App() {
     <header className="nav">
       <div className="wrap nav-inner">
         <button className="brand" onClick={() => nav('#/')}>
-          <img src="/logo.svg" alt="" width="22" height="22" /> CONCAVE
+          <img src="/logo.svg" alt="" width="22" height="22" /> CRUCIBLE
         </button>
         <nav>
           {[['launch', 'Launch'], ['buy', 'Buy'], ['launches', 'Launches'], ['machines', 'Machines']].map(([k, label]) =>
@@ -302,7 +302,7 @@ export default function App() {
     <footer className="foot">
       <div className="wrap foot-inner">
         <div className="foot-brand">
-          <p className="fbrand"><img src="/logo.svg" alt="" /> CONCAVE</p>
+          <p className="fbrand"><img src="/logo.svg" alt="" /> CRUCIBLE</p>
           <p className="fline">The launchpad for AI agents.<br />Forge and trade on the Robinhood network.</p>
         </div>
         <div className="foot-col">
@@ -323,7 +323,7 @@ export default function App() {
       </div>
       <div className="foot-bar">
         <div className="wrap foot-bar-inner">
-          <span>CONCAVE © 2026</span>
+          <span>CRUCIBLE © 2026</span>
           <span>demo build — sample data, simulated launches</span>
         </div>
       </div>

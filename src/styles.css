@@ -148,6 +148,7 @@ img { max-width: 100%; }
 .mach-card .mach { border: 0; border-radius: 10px; }
 .mach-card h3 { margin: .9rem 0 .3rem; font-size: 1.05rem; }
 .mach-card .role { color: var(--accent); font-weight: 700; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 .5rem; }
+.mach-card .role .soon { display: inline-block; margin-left: .5rem; color: var(--muted); background: var(--bg); border: 1px solid var(--rule); border-radius: 99px; padding: .2rem .55rem; font-weight: 600; letter-spacing: .06em; vertical-align: middle; }
 .mach-card .desc { color: var(--muted); font-size: .9rem; margin: 0; }
 
 /* pages */

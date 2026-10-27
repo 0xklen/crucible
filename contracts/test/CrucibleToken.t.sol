@@ -2,14 +2,14 @@
 pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {ConcaveToken} from "../src/ConcaveToken.sol";
+import {CrucibleToken} from "../src/CrucibleToken.sol";
 
-contract ConcaveTokenTest is Test {
-    ConcaveToken tok;
+contract CrucibleTokenTest is Test {
+    CrucibleToken tok;
     address buyer = address(0xB0B);
 
     function setUp() public {
-        tok = new ConcaveToken("Nova", "NOVA", 1 gwei);
+        tok = new CrucibleToken("Nova", "NOVA", 1 gwei);
         vm.deal(buyer, 100 ether);
     }
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-# CONCAVE
+# CRUCIBLE
 
 **The launchpad for AI agents.**
 
@@ -14,13 +14,13 @@ Forge tokens and buy on the bonding curve by telling your agent — one prompt, 
 
 </div>
 
-![CONCAVE hero](docs/screenshot.png)
+![CRUCIBLE hero](docs/screenshot.png)
 
 ---
 
 ## What this is
 
-CONCAVE is a launchpad where the operator is an agent, not a dashboard.
+CRUCIBLE is a launchpad where the operator is an agent, not a dashboard.
 Minting a token **and** buying on the bonding curve both happen by telling
 your agent what to do.
 
@@ -39,16 +39,16 @@ drive the contract directly.
 
 ```bash
 # Hermes (or any SKILL.md-based agent): install the skill
-cp -r skill ~/.hermes/skills/concave
+cp -r skill ~/.hermes/skills/crucible
 ```
 
 The skill (`skill/SKILL.md`) teaches the agent the exact `forge`/`cast`
 commands to deploy, buy and sell. The contract is a real, tested bonding
 curve:
 
-- `contracts/src/ConcaveToken.sol` — ERC-20 with `price(n) = K * n`;
+- `contracts/src/CrucibleToken.sol` — ERC-20 with `price(n) = K * n`;
   `buy()` mints along the curve, `sell()` burns and refunds.
-- `contracts/test/ConcaveToken.t.sol` — 4 tests proving the curve math.
+- `contracts/test/CrucibleToken.t.sol` — 4 tests proving the curve math.
 - `contracts/script/Deploy.s.sol` — deploy helper.
 
 ```bash
@@ -60,7 +60,7 @@ forge test             # prove the curve math — 4 tests pass
 ### Launch
 
 ```
-Launch a token on CONCAVE: name Nova, ticker NOVA, 1,000,000,000 fixed
+Launch a token on CRUCIBLE: name Nova, ticker NOVA, 1,000,000,000 fixed
 supply, anti-snipe tax on at open. Deploy it on the Robinhood network and
 report the contract address.
 ```
@@ -68,7 +68,7 @@ report the contract address.
 ### Buy on the curve (paste any CA)
 
 ```
-Buy 0.1 ETH of the token at <CONTRACT_ADDRESS> on the CONCAVE bonding curve
+Buy 0.1 ETH of the token at <CONTRACT_ADDRESS> on the CRUCIBLE bonding curve
 on the Robinhood network. Report the tokens received and the price paid.
 ```
 
@@ -105,7 +105,7 @@ npm run build        # production build -> dist/
 ## Repo layout
 
 ```
-concave/
+crucible/
 ├── src/               React app (Vite)
 ├── public/            logo, machine figures
 ├── contracts/         Foundry: bonding-curve token + tests + deploy script
@@ -116,5 +116,5 @@ concave/
 
 ## Notes
 
-Site launch figures are sample data (labelled in the UI). The `ConcaveToken`
+Site launch figures are sample data (labelled in the UI). The `CrucibleToken`
 contract is real and tested; deploying it on Robinhood spends real ETH for gas.

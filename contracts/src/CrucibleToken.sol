@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @title ConcaveToken
+/// @title CrucibleToken
 /// @notice A bonding-curve ERC-20. Price rises linearly with supply:
 ///         price(n) = K * n. buy() mints along the curve, sell() burns and
 ///         refunds. Deploy on Robinhood (chainId 4663); buyers act on the
 ///         contract address (CA) the deployer returns.
-contract ConcaveToken {
+contract CrucibleToken {
     string public name;
     string public symbol;
     uint8 public constant decimals = 18;

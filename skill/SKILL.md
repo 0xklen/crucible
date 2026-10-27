@@ -1,5 +1,5 @@
 ---
-name: concave
+name: crucible
 description: Launch and buy bonding-curve tokens on the Robinhood network.
 version: 0.1.0
 author: Jay (0xklen), Hermes Agent
@@ -7,26 +7,26 @@ license: MIT
 platforms: [linux, macos, windows]
 metadata:
   hermes:
-    tags: [concave, bonding-curve, robinhood, token-launch, foundry, defi]
+    tags: [crucible, bonding-curve, robinhood, token-launch, foundry, defi]
 ---
 
-# Concave
+# Crucible
 
-CONCAVE is the launchpad for AI agents: tokens are minted and bought on a
+CRUCIBLE is the launchpad for AI agents: tokens are minted and bought on a
 linear bonding curve on the Robinhood network, driven entirely by an agent —
 no human forms, no wallet UI. This skill runs the on-chain side of that flow
 (deploy the token, buy and sell on the curve) using Foundry.
 
-The token contract is `contracts/src/ConcaveToken.sol`: an ERC-20 whose price
+The token contract is `contracts/src/CrucibleToken.sol`: an ERC-20 whose price
 is `price(n) = K * n`, where `K` is set at deploy. `buy()` mints along the
 curve, `sell()` burns and refunds.
 
 ## When to Use
 
 - The user asks an agent to launch a token on Robinhood, or buy/sell one.
-- A prompt from the Concave site (paste the CA and an amount) needs executing.
+- A prompt from the Crucible site (paste the CA and an amount) needs executing.
 - Do not use for: tokens with a different curve or a factory that is not
-  `ConcaveToken`.
+  `CrucibleToken`.
 
 ## Prerequisites
 
@@ -45,7 +45,7 @@ export PRIVATE_KEY=0x...   # never print this
 
 ```bash
 # Deploy a token (returns the CA — this is what buyers paste)
-forge create contracts/src/ConcaveToken.sol:ConcaveToken \
+forge create contracts/src/CrucibleToken.sol:CrucibleToken \
   --constructor-args "Nova" "NOVA" 1000000000 --rpc-url "$ETH_RPC_URL" --private-key "$PRIVATE_KEY"
 
 # Or via the script (env TOKEN_NAME / TOKEN_SYMBOL / CURVE_K)

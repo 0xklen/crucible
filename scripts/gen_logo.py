@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Generate CONCAVE's logo.svg from the supplied pincushion mark.
+"""Generate CRUCIBLE's logo.svg from the supplied pincushion mark.
 
 The mark is a symmetric shape with four protruding rounded corners and four
-concave sides: in polar form r(theta) = R - k*cos(4*theta). This script keeps
+crucible sides: in polar form r(theta) = R - k*cos(4*theta). This script keeps
 the derivation reproducible next to the asset.
 """
 import math
@@ -20,8 +20,8 @@ def pt(theta):
 pts = [pt(2 * math.pi * i / N) for i in range(N)]
 d = "M " + " L ".join(f"{x:.1f},{y:.1f}" for x, y in pts) + " Z"
 
-svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="CONCAVE">
-  <title>CONCAVE</title>
+svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="CRUCIBLE">
+  <title>CRUCIBLE</title>
   <path d="{d}" fill="{FILL}"/>
 </svg>'''
 
