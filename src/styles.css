@@ -1,6 +1,6 @@
 :root {
   --bg: #f2efe7;
-  --card: #ffffff;
+  --card: #f2efe7;
   --ink: #231e16;
   --muted: #857d6e;
   --rule: #ddd6c8;
@@ -49,6 +49,7 @@ img { max-width: 100%; }
 .nav nav button { all: unset; cursor: pointer; padding: .5rem .8rem; border-radius: 8px; color: var(--muted); font-size: .78rem; letter-spacing: .055em; text-transform: uppercase; font-weight: 600; }
 .nav nav button:hover { color: var(--ink); }
 .chain-chip { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--muted); border: 1px solid var(--rule); border-radius: 99px; padding: .34rem .7rem; white-space: nowrap; }
+.sample.live { color: var(--ok); border-color: var(--ok); }
 
 /* buttons */
 .btn { all: unset; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: .5rem; background: var(--ink); color: var(--bg); font-weight: 600; font-size: .95rem; padding: .85rem 1.5rem; border-radius: 10px; transition: transform .12s ease, opacity .2s ease; }

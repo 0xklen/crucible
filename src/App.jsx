@@ -20,6 +20,37 @@ function useHash() {
   return h
 }
 
+function useLaunches() {
+  const [launches, setLaunches] = useState(LAUNCHES)
+  const [live, setLive] = useState(false)
+  useEffect(() => {
+    let stop = false
+    const load = async () => {
+      try {
+        const r = await fetch('/api/launches', { cache: 'no-store' })
+        if (!r.ok) throw new Error('offline')
+        const data = await r.json()
+        if (Array.isArray(data) && data.length && !stop) {
+          setLaunches(data)
+          setLive(true)
+        }
+      } catch (e) {
+        /* no /api in local dev — keep the bundled sample data */
+      }
+    }
+    load()
+    const t = setInterval(load, 15000)
+    return () => { stop = true; clearInterval(t) }
+  }, [])
+  return { launches, live }
+}
+
+function LiveBadge({ live }) {
+  return live
+    ? <span className="sample live">● live feed</span>
+    : <span className="sample">sample data</span>
+}
+
 function Machine({ file, title }) {
   if (!file) {
     return <div className="mach placeholder">
@@ -91,8 +122,8 @@ function LaunchCard({ l, nav }) {
   </button>
 }
 
-function Home({ nav, go }) {
-  const featured = LAUNCHES.slice(0, 4)
+function Home({ nav, go, launches, live }) {
+  const featured = launches.slice(0, 4)
   return <>
     <section className="hero">
       <div className="wrap hero-inner">
@@ -111,7 +142,7 @@ function Home({ nav, go }) {
 
     <section className="strip wrap">
       <div className="stat"><b>1</b><span>skill to install</span></div>
-      <div className="stat"><b>{LAUNCHES.length}</b><span>tokens launched</span></div>
+      <div className="stat"><b>{launches.length}</b><span>tokens launched</span></div>
       <div className="stat"><b>{CHAIN.name}</b><span>network</span></div>
       <div className="stat"><b>{CHAIN.id}</b><span>chain id</span></div>
     </section>
@@ -149,7 +180,7 @@ function Home({ nav, go }) {
     <section className="wrap block" id="launches">
       <div className="section-head">
         <h2 className="h2">Launched with the skill</h2>
-        <span className="sample">sample data</span>
+        <LiveBadge live={live} />
       </div>
       <div className="grid">
         {featured.map(l => <LaunchCard key={l.id} l={l} nav={nav} />)}
@@ -174,19 +205,19 @@ function Home({ nav, go }) {
   </>
 }
 
-function Launches({ nav }) {
+function Launches({ nav, launches, live }) {
   return <section className="wrap page">
     <button className="link back" onClick={() => nav('#/')}>← Home</button>
     <h1 className="display">Launches</h1>
-    <p className="lede">Every token here was launched through the crucible-launchpad skill on the Robinhood network. Figures are sample data for the demo.</p>
+    <p className="lede">Every token here was launched through the crucible-launchpad skill on the Robinhood network. <LiveBadge live={live} /></p>
     <div className="grid">
-      {LAUNCHES.map(l => <LaunchCard key={l.id} l={l} nav={nav} />)}
+      {launches.map(l => <LaunchCard key={l.id} l={l} nav={nav} />)}
     </div>
   </section>
 }
 
-function Token({ id, nav }) {
-  const l = LAUNCHES.find(x => x.id === id)
+function Token({ id, nav, launches }) {
+  const l = launches.find(x => x.id === id)
   if (!l) return <section className="wrap page"><h1 className="display">Not found</h1><button className="link" onClick={() => nav('#/launches')}>← Back</button></section>
   const buyCmd = USAGE.find(u => u.id === 'buy').cmd.replace('<CA>', l.ca)
   const sellCmd = USAGE.find(u => u.id === 'sell').cmd.replace('<CA>', l.ca)
@@ -224,6 +255,7 @@ function Token({ id, nav }) {
 
 export default function App() {
   const hash = useHash()
+  const { launches, live } = useLaunches()
   const nav = h => { location.hash = h }
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean)
   const onHome = parts[0] !== 'launches' && parts[0] !== 'token'
@@ -234,9 +266,9 @@ export default function App() {
   }
 
   let page
-  if (parts[0] === 'launches') page = <Launches nav={nav} />
-  else if (parts[0] === 'token') page = <Token key={parts[1]} id={parts[1]} nav={nav} />
-  else page = <Home nav={nav} go={go} />
+  if (parts[0] === 'launches') page = <Launches nav={nav} launches={launches} live={live} />
+  else if (parts[0] === 'token') page = <Token key={parts[1]} id={parts[1]} nav={nav} launches={launches} />
+  else page = <Home nav={nav} go={go} launches={launches} live={live} />
 
   return <div className="app">
     <header className="nav">

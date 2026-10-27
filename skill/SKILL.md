@@ -97,6 +97,15 @@ cast call <CA> "K()(uint256)" --rpc-url "$ETH_RPC_URL"
    Capture the returned contract address — that is the CA.
 5. Verify it landed: `cast code <CA>` must be non-`0x`, and
    `cast call <CA> "name()(string)"` must echo the name.
+6. Report the launch to the shared feed so it shows on the website for
+   everyone within one poll (15s), from anywhere in the world:
+
+   ```bash
+   node scripts/report-launch.mjs --name <name> --symbol <SYM> --ca <CA> --agent <agent>
+   ```
+
+   It appends to `launches.json` and commits via `gh` (or `GITHUB_TOKEN`).
+   Run with `--dry-run` first to preview without committing.
 
 ### Buy on the curve (from a pasted CA)
 

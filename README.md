@@ -64,6 +64,10 @@ forge test             # prove the curve math — 4 tests pass
   password; the agent never sees the private key.
 - **Install + usage on the site** — how to install the skill, and what to say
   to launch, buy and sell, with the underlying commands shown.
+- **Live launch feed** — the skill reports each launch to `launches.json`;
+  the site polls `/api/launches` (a Vercel function that reads the file
+  through the GitHub API), so a token launched in the US shows up for a
+  visitor in Japan within one poll (~15s).
 - **Launches** — every token launched through the skill is listed with its
   contract address and one-click copy.
 - **The machines** — three embedded isometric figures (The Press, The Vending
@@ -102,5 +106,16 @@ crucible/
 
 ## Notes
 
-Site launch figures are sample data (labelled in the UI). The `CrucibleToken`
-contract is real and tested; deploying it on Robinhood spends real ETH for gas.
+The `CrucibleToken` contract is real and tested; deploying it on Robinhood
+spends real ETH for gas. Launch figures seed from `launches.json`; the site
+falls back to bundled sample data (labelled "sample data" in the UI) when the
+live feed is unreachable.
+
+To make the live feed work in production:
+
+1. Deploy the site to Vercel — the `api/launches.js` serverless function is
+   picked up automatically.
+2. Set `GITHUB_TOKEN` (a fine-grained PAT with read access to this repo) in
+   the Vercel env to lift the GitHub API rate limit.
+3. The skill reports launches with `node scripts/report-launch.mjs`, which
+   needs `gh` auth (or `GITHUB_TOKEN`) on the machine running it.
