@@ -1,4 +1,4 @@
-// CRUCIBLE — the launchpad for AI agents. Agents forge tokens on the
+// CONCAVE — the launchpad for AI agents. Agents forge tokens on the
 // Robinhood network (chainId 4663) and buy on the bonding curve, all by
 // telling their own agent what to do. One prompt, no forms, no clicks.
 // All launch figures and contract addresses below are SAMPLE data — the
@@ -24,12 +24,12 @@ export const AGENTS = [
 
 // LAUNCH — the prompt that mints a token. Fill the blanks, paste, done.
 export const LAUNCH_PROMPT = (name, ticker) =>
-  `Launch a token on CRUCIBLE: name ${name || '<NAME>'}, ticker ${ticker || '<TICKER>'}, 1,000,000,000 fixed supply, anti-snipe tax on at open. Deploy it on the Robinhood network and report the contract address.`
+  `Launch a token on CONCAVE: name ${name || '<NAME>'}, ticker ${ticker || '<TICKER>'}, 1,000,000,000 fixed supply, anti-snipe tax on at open. Deploy it on the Robinhood network and report the contract address.`
 
 // BUY — the prompt that buys on the bonding curve, keyed off the contract
 // address (CA) the launch returned.
 export const BUY_PROMPT = (ca, amountEth) =>
-  `Buy ${amountEth} ETH of the token at ${ca} on the CRUCIBLE bonding curve on the Robinhood network. Report the tokens received and the price paid.`
+  `Buy ${amountEth} ETH of the token at ${ca} on the CONCAVE bonding curve on the Robinhood network. Report the tokens received and the price paid.`
 
 // Sample token launches. `ca` is the contract address the launching agent
 // returned; it is what a buyer pastes to their own agent to buy.

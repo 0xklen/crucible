@@ -4,3 +4,8 @@ dist/
 *.local
 .env
 .vite/
+
+# Foundry build artifacts
+contracts/cache/
+contracts/out/
+contracts/broadcast/

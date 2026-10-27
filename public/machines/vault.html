@@ -10,7 +10,7 @@
 </head><body>
 <script src="core.js"></script>
 <script>
-/* CRUCIBLE — The Vault. When the curve completes, liquidity locks here and seeds the Uniswap v4 pool. */
+/* CONCAVE — The Vault. When the curve completes, liquidity locks here and seeds the Robinhood DEX pool. */
 const W = 40, D = 40, H = 40;
 const CX = W/2, CY = D/2, CZ = H/2;
 const STEEL = { l:'#d8dcdf', m:'#a8aeb4', d:'#52585e' };
@@ -122,7 +122,7 @@ function runLoop(){
     stepSim(st, now, dt); const busy = st.lock > 0 && st.lock < 1; if (!busy) loopOn = false; return busy; });
 }
 function lock(st){ if (st.lock > 0 && st.lock < 1) return; st.lock = 0.001; runLoop(); }
-const vaultCaption = st => st.lock > 0 && st.lock < 1 ? 'The bolts slide in and the door seals.' : 'The completed liquidity locks inside and seeds the Uniswap v4 pool.';
+const vaultCaption = st => st.lock > 0 && st.lock < 1 ? 'The bolts slide in and the door seals.' : 'The completed liquidity locks inside and seeds the Robinhood DEX pool.';
 
 ui = mountFigure({
   fig:'15', turn:'full', title:'The Vault', hint:'Click to lock · drag to turn',

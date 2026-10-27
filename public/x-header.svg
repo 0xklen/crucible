@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" width="1500" height="500" role="img" aria-label="CRUCIBLE header">
-  <title>CRUCIBLE</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" width="1500" height="500" role="img" aria-label="CONCAVE header">
+  <title>CONCAVE</title>
   <defs>
     <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#ff4d1a"/>
@@ -9,7 +9,7 @@
   <rect width="1500" height="500" fill="#ffffff"/>
   <circle cx="300" cy="250" r="120" fill="#0b0b0c"/>
   <path d="M300 183 L318 232 L367 250 L318 268 L300 317 L282 268 L233 250 L282 232 Z" fill="#ffffff"/>
-  <text x="470" y="292" font-family="Helvetica, Arial, sans-serif" font-size="118" font-weight="800" letter-spacing="5" fill="#0b0b0c">CRUCIBLE</text>
+  <text x="470" y="292" font-family="Helvetica, Arial, sans-serif" font-size="118" font-weight="800" letter-spacing="5" fill="#0b0b0c">CONCAVE</text>
   <text x="474" y="334" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="2.4" fill="#9a9aa3">FORGE YOUR TOKEN ON ETHEREUM · GRADUATES TO UNISWAP V4</text>
   <rect x="474" y="352" width="660" height="4" rx="2" fill="url(#accent)"/>
 </svg>

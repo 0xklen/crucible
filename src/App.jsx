@@ -84,10 +84,12 @@ function LaunchCard({ l, nav }) {
   </button>
 }
 
-function BuyPanel({ token, amount, setAmount }) {
-  const prompt = BUY_PROMPT(token.ca, amount)
+function BuyPanel({ ca, setCa, amount, setAmount }) {
+  const prompt = BUY_PROMPT(ca, amount)
   return <div className="prompt-hero">
-    <CaRow ca={token.ca} />
+    <label className="ca-field">Contract address — paste any token's CA
+      <input value={ca} onChange={e => setCa(e.target.value)} placeholder="0x…" spellCheck={false} autoComplete="off" />
+    </label>
     <label className="amt">Amount in ETH
       <input value={amount} onChange={e => setAmount(e.target.value)} inputMode="decimal" placeholder="0.1" />
     </label>
@@ -101,16 +103,16 @@ function Home({ nav, go }) {
   const [name, setName] = useState('')
   const [ticker, setTicker] = useState('')
   const [buyId, setBuyId] = useState(LAUNCHES[0].id)
+  const [ca, setCa] = useState(LAUNCHES[0].ca)
   const [amount, setAmount] = useState('0.1')
   const launchPrompt = LAUNCH_PROMPT(name, ticker)
-  const buyToken = LAUNCHES.find(x => x.id === buyId)
 
   return <>
     <section className="hero">
       <div className="wrap hero-inner">
         <p className="eyebrow">Robinhood network — for AI agents</p>
         <h1 className="display">Forge and trade tokens with your agent.</h1>
-        <p className="lede">CRUCIBLE is the launchpad for AI agents. Tell Hermes, Claude or Codex what to launch, or paste a contract address and tell your agent to buy on the bonding curve — no forms, no wallets, no clicks.</p>
+        <p className="lede">CONCAVE is the launchpad for AI agents. Tell Hermes, Claude or Codex what to launch, or paste a contract address and tell your agent to buy on the bonding curve — no forms, no wallets, no clicks.</p>
         <div className="hero-cta">
           <button className="btn" onClick={() => go('launch')}>Launch a token</button>
           <button className="btn ghost" onClick={() => go('buy')}>Buy on the curve</button>
@@ -184,12 +186,12 @@ function Home({ nav, go }) {
       <p className="sub">Pick a token, copy its contract address, and paste the buy prompt into your agent. Buying only ever happens through an agent.</p>
       <div className="buy-picker">
         {featured.map(l => (
-          <button key={l.id} className={'chip' + (buyId === l.id ? ' on' : '')} onClick={() => setBuyId(l.id)}>
+          <button key={l.id} className={'chip' + (buyId === l.id ? ' on' : '')} onClick={() => { setBuyId(l.id); setCa(l.ca) }}>
             <span className="chip-dot" style={{ background: l.color }} />{l.symbol}
           </button>
         ))}
       </div>
-      <BuyPanel token={buyToken} amount={amount} setAmount={setAmount} />
+      <BuyPanel ca={ca} setCa={setCa} amount={amount} setAmount={setAmount} />
     </section>
 
     <section className="wrap block" id="launches">
@@ -234,6 +236,7 @@ function Launches({ nav }) {
 function Token({ id, nav }) {
   const l = LAUNCHES.find(x => x.id === id)
   const [amount, setAmount] = useState('0.1')
+  const [ca, setCa] = useState(l ? l.ca : '')
   if (!l) return <section className="wrap page"><h1 className="display">Not found</h1><button className="link" onClick={() => nav('#/launches')}>← Back</button></section>
   return <section className="wrap page">
     <button className="link back" onClick={() => nav('#/launches')}>← All launches</button>
@@ -247,10 +250,10 @@ function Token({ id, nav }) {
     </div>
     <div className="panel buy-panel">
       <h3>Buy with your agent</h3>
-      <BuyPanel token={l} amount={amount} setAmount={setAmount} />
+      <BuyPanel ca={ca} setCa={setCa} amount={amount} setAmount={setAmount} />
     </div>
     <div className="panel detail-panel">
-      <div className="drow"><span>Contract address</span><b>{l.ca}</b></div>
+      <CaRow ca={l.ca} />
       <div className="drow"><span>Total supply</span><b>{l.supply}</b></div>
       <div className="drow"><span>Market cap</span><b>{fmt(l.mcap)}</b></div>
       <div className="drow"><span>Holders</span><b>{l.holders.toLocaleString()}</b></div>
@@ -286,7 +289,7 @@ export default function App() {
     <header className="nav">
       <div className="wrap nav-inner">
         <button className="brand" onClick={() => nav('#/')}>
-          <img src="/logo.svg" alt="" width="22" height="22" /> CRUCIBLE
+          <img src="/logo.svg" alt="" width="22" height="22" /> CONCAVE
         </button>
         <nav>
           {[['launch', 'Launch'], ['buy', 'Buy'], ['launches', 'Launches'], ['machines', 'Machines']].map(([k, label]) =>
@@ -299,7 +302,7 @@ export default function App() {
     <footer className="foot">
       <div className="wrap foot-inner">
         <div className="foot-brand">
-          <p className="fbrand"><img src="/logo.svg" alt="" /> CRUCIBLE</p>
+          <p className="fbrand"><img src="/logo.svg" alt="" /> CONCAVE</p>
           <p className="fline">The launchpad for AI agents.<br />Forge and trade on the Robinhood network.</p>
         </div>
         <div className="foot-col">
@@ -320,7 +323,7 @@ export default function App() {
       </div>
       <div className="foot-bar">
         <div className="wrap foot-bar-inner">
-          <span>CRUCIBLE © 2026</span>
+          <span>CONCAVE © 2026</span>
           <span>demo build — sample data, simulated launches</span>
         </div>
       </div>

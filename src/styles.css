@@ -119,6 +119,9 @@ img { max-width: 100%; }
 .ca-row { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .ca-label { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
 .ca { font-family: inherit; font-size: .9rem; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; min-width: 0; font-variant-numeric: tabular-nums; }
+.ca-field { display: flex; flex-direction: column; gap: .4rem; font-size: .85rem; color: var(--muted); margin-bottom: .8rem; }
+.ca-field input { background: var(--bg); border: 1px solid var(--rule); color: var(--ink); border-radius: 10px; padding: .75rem .9rem; font-size: .95rem; font-family: inherit; font-variant-numeric: tabular-nums; }
+.ca-field input:focus { outline: none; border-color: var(--ink); }
 .amt { display: flex; flex-direction: column; gap: .4rem; font-size: .85rem; color: var(--muted); margin-bottom: .4rem; }
 
 /* launch cards */
