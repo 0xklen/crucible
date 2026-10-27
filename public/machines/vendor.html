@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Vending Machine</title>
+<style>
+  h1, h2, h3, #btns, .ctl, .pals, .vset, .vrow, .lblctl, .lgd, .zchip,
+  footer, .made-with, .toast, .stepwrap, .readout, .mcap { display: none !important; }
+  body { margin: 0; }
+  .stage { margin: 0 !important; }
+</style>
+</head><body>
+<script src="core.js"></script>
+<script>
+/* CRUCIBLE — The Vending Machine. Buyers feed ETH and the machine vends tokens along the curve. */
+const W = 40, D = 40, H = 56;
+const CX = W/2, CY = D/2;
+const CAB = { l:'#c94f3d', m:'#a83a2b', d:'#57190f' };
+const CDARK = { l:'#8a2c20', m:'#6b2017', d:'#330d08' };
+const STEEL = { l:'#d8dcdf', m:'#a8aeb4', d:'#52585e' };
+const GRAPH = { l:'#3c4046', m:'#2a2d32', d:'#16181b' };
+const BRASS = { l:'#e6c15a', m:'#c29a34', d:'#6e5518' };
+const SHELF = { l:'#ecebe6', m:'#d6d3cb', d:'#8b877d' };
+const TOKEN = { l:'#f2c14e', m:'#d49c1f', d:'#7a5a10' };
+const GLASS = 'rgba(168,208,235,0.42)';
+const SHEEN = 'rgba(255,255,255,0.28)';
+const GLOW = 'rgba(255,196,120,0.16)';
+const SHELVES = [15, 26, 37];
+const FALL_FROM = 18, FALL_TO = 6.5, COIN_R = 2.6;
+
+const coinAt = (x, y, z) => cyl(x, y, z, z + 2, COIN_R, TOKEN, toneI, 1, 18);
+
+function shelvesAndTokens(){
+  let s = '';
+  for (const z of SHELVES){
+    s += box(5, 5, z, W-5, D-9, z + 1.3, SHELF, toneI, .7);
+    const n = 3 + Math.floor(z / 10);
+    for (let i = 0; i < n; i++) s += coinAt(9 + i*7, CY, z + 1.3);
+  }
+  return s;
+}
+function fallingToken(st){
+  if (st.vend <= 0) return '';
+  const z = FALL_TO + (FALL_FROM - FALL_TO) * (1 - st.vend);
+  return coinAt(CX, CY, z);
+}
+function restTokens(st){
+  let s = '';
+  for (let i = 0; i < Math.min(st.dispensed, 4); i++)
+    s += coinAt(CX, CY - 6 + i*1.6, 3.4);
+  return s;
+}
+function glass(){
+  let s = face(pd(on(PX(W-0.2), rectUV(4, D-9, 10, H-13))), GLASS);
+  s += fill(pd([ [W-0.2, 5, H-16], [W-0.2, D-10, H-11], [W-0.2, D-10, H-15], [W-0.2, 5, H-20] ]), SHEEN);
+  s += ink(pd(on(PX(W-0.15), rectUV(4, D-9, 10, H-13))), 2.2);
+  return s;
+}
+function keypad(){
+  let s = '';
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++){
+    const y = D-8.6 + c*2.3, z = H-22 + r*2.3;
+    s += box(W-0.5, y, z, W-0.1, y+1.7, z+1.7, GRAPH, toneI, .4);
+  }
+  return s;
+}
+
+function scene(st, m){
+  let s = castShadow([[0,0,0],[W,0,0],[W,D,0],[0,D,0]]);
+  let body = '';
+  // cabinet + base skirt + top band
+  body += box(2, 2, 0, W-2, D-2, H-4, CAB, toneI, .8);
+  body += box(1, 1, 0, W-1, D-1, 4, CDARK, toneI, .6);
+  body += box(2, 2, H-9, W-2, D-2, H-3, CDARK, toneI, .6);
+  body += box(1.4, 1.4, H-3, W-1.4, D-1.4, H-0.5, STEEL, toneI, .5);
+  // glowing screen (no lettering) inside the top band
+  body += face(pd(on(PX(W-0.2), rectUV(5, D-9, H-8.4, H-4.6))), 'rgba(255,214,150,0.55)');
+  // interior: shelves, tokens, warm glow, glass
+  body += shelvesAndTokens();
+  body += fallingToken(st);
+  body += restTokens(st);
+  body += fill(pd(on(PX(W-0.3), rectUV(4, D-9, 10, H-13))), GLOW);
+  body += glass();
+  // control panel (right) + keypad + coin slot
+  body += face(pd(on(PX(W-0.2), rectUV(D-9.5, D-2, 10, H-13))), CDARK.m);
+  body += keypad();
+  body += box(W-0.6, D-6.2, H-14, W-0.1, D-3.6, H-11.6, BRASS, toneI, .5);
+  body += box(W-0.5, D-5.9, H-13.6, W-0.1, D-3.9, H-12, GRAPH, toneI, .4);
+  // dispense tray
+  body += box(W-1.6, CY-8, 2, W-0.1, CY+8, 9, GRAPH, toneI, .6);
+  body += box(W-1.8, CY-9, 2, W-0.1, CY+9, 3.4, STEEL, toneI, .6);
+
+  const k = ease(st.xr || 0);
+  if (k > 0) body = xrGhost(body, '', k, rectUV(0, 0, D, H), 0, W, m) + `<g opacity="${k}">${vendorMech(st, k)}</g>`;
+  s += body;
+  return s;
+}
+let MECH_LABELS = '';
+function vendorMech(st, k){
+  const parts = [];
+  const put = (b, svg) => parts.push({ box: b, svg });
+  for (const z of SHELVES){
+    put([[5,5,z],[W-5,D-9,z+1.3]], box(5,5,z,W-5,D-9,z+1.3,SHELF,toneI,.7));
+    const n = 3 + Math.floor(z/10);
+    for (let i = 0; i < n; i++)
+      put([[9+i*7-COIN_R,CY-COIN_R,z+1.3],[9+i*7+COIN_R,CY+COIN_R,z+3.3]], coinAt(9+i*7, CY, z+1.3));
+  }
+  put([[CX-2, CY-6, 4],[CX+2, CY+6, 18]], box(CX-2, CY-6, 4, CX+2, CY+6, 18, GRAPH, toneI, .5));
+  if (st.vend > 0){ const z = FALL_TO + (FALL_FROM - FALL_TO)*(1-st.vend); put([[CX-COIN_R, CY-COIN_R, z],[CX+COIN_R, CY+COIN_R, z+2]], coinAt(CX, CY, z)); }
+  put([[W-4, D-8, H-13],[W-1, D-6, H-9]], box(W-4, D-8, H-13, W-1, D-6, H-9, GRAPH, toneI, .3));
+  MECH_LABELS = k <= .6 ? '' : xrCallouts([
+    { at:[CX, CY, SHELVES[0]+1], text:'TOKENS ON SHELVES', on:false },
+    { at:[CX, CY, FALL_TO], text:'DISPENSE TRAY', on:st.vend>0 || st.dispensed>0 },
+    { at:[W-1, D-5, H-12], text:'COIN SLOT', on:false },
+  ], [0, W+4, 0, D, -2, H+14]);
+  return byDepth(parts);
+}
+
+let ui, loopOn = false;
+function stepSim(st, now, dt){
+  if (st.vend > 0 && st.vend < 1){
+    st.vend = Math.min(1, st.vend + dt/900);
+    if (st.vend >= 1) st.dispensed++;
+  }
+}
+function runLoop(){
+  if (loopOn) return; loopOn = true;
+  let last = performance.now();
+  ui.animate(() => { const st = ui.st, now = performance.now(), dt = Math.min(100, now-last); last = now;
+    stepSim(st, now, dt); const busy = st.vend > 0 && st.vend < 1; if (!busy) loopOn = false; return busy; });
+}
+function vend(st){ if (st.vend > 0 && st.vend < 1) return; st.vend = 0.001; runLoop(); }
+const vendorCaption = st => st.vend > 0 && st.vend < 1 ? 'A token drops from the shelf into the tray.' : 'Feed ETH and the machine vends tokens at the curve price.';
+
+ui = mountFigure({
+  fig:'14', turn:'full', title:'The Vending Machine', hint:'Click to vend · drag to turn',
+  idea:'A vending machine that vends tokens at the bonding-curve price.',
+  size:[W+4, D, H+14], center:[W/2+2, D/2], palette:'mustard',
+  state:{ vend:0, dispensed:0 },
+  scene,
+  readout: st => st.vend > 0 && st.vend < 1 ? 'vending a token' : (st.dispensed > 0 ? `${st.dispensed} tokens vended` : 'ready'),
+  buttons:[ { label:'Vend', onClick: vend } ],
+  acts:{},
+  params:(st, q) => { if (q.has('vend')) st.vend = +q.get('vend'); if (q.has('dispensed')) st.dispensed = +q.get('dispensed') | 0; },
+});
+window.vendMachine = () => { vend(ui.st); };
+document.querySelector('.stage').addEventListener('click', () => { vend(ui.st); ui.render(); });
+addEventListener('keydown', e => {
+  if (/input|textarea|button/i.test(e.target.tagName)) return;
+  if (e.key === ' ' || e.key === 'Enter'){ vend(ui.st); e.preventDefault(); ui.render(); }
+});
+xrMount(() => ui, vendorCaption);
+</script></body></html>

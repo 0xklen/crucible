@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Press</title>
+<style>
+  h1, h2, h3, #btns, .ctl, .pals, .vset, .vrow, .lblctl, .lgd, .zchip,
+  footer, .made-with, .toast, .stepwrap, .readout, .mcap { display: none !important; }
+  body { margin: 0; }
+  .stage { margin: 0 !important; }
+</style>
+</head><body>
+<script src="core.js"></script>
+<script>
+/* CRUCIBLE — The Press. A hydraulic coin press: blanks feed in, the ram strikes the die,
+   and a stamped token drops out. One strike mints the full supply. */
+const W = 46, D = 46, H = 58;
+const CX = W/2, CY = D/2;
+const STEEL = { l:'#d8dcdf', m:'#a8aeb4', d:'#52585e' };
+const DSTEEL = { l:'#7d848c', m:'#5c6269', d:'#2f343a' };
+const GRAPH = { l:'#3c4046', m:'#2a2d32', d:'#16181b' };
+const BRASS = { l:'#e6c15a', m:'#c29a34', d:'#6e5518' };
+const COIN = { l:'#f2c14e', m:'#d49c1f', d:'#7a5a10' };
+const ANVIL_TOP = 11, COIN_R = 7;
+
+function coinTop(z){ const s = COIN_R*.5; return [[CX, CY+s],[CX+s*.7, CY],[CX, CY-s],[CX-s*.7, CY],[CX, CY+s]]; }
+function flywheel(){
+  let s = cylX(CX-2.5, CX+2.5, CY, H-3, 8, BRASS, toneI, 1, 26);
+  s += cylX(CX-2.4, CX+2.4, CY, H-3, 5.8, GRAPH, toneI, .8, 22);
+  for (let i = 0; i < 4; i++){ const a = i/4*2*Math.PI, y = CY+Math.sin(a)*5.6, z = H-3+Math.cos(a)*5.6;
+    s += ink(pd([[CX+2.5, CY, H-3],[CX+2.5, y, z]]), 1.7); }
+  s += cylX(CX-2.6, CX+3.2, CY, H-3, 1.8, STEEL, toneI, .7, 12);
+  return s;
+}
+function ram(st){
+  const ramZ = H-9 - 33*st.ram;
+  let s = cyl(CX, CY, H-15, H-6, 4.2, DSTEEL, toneI, .8, 20);                    // outer cylinder (fixed)
+  s += cyl(CX, CY, Math.min(H-15, ramZ+3), Math.max(H-15, ramZ+3), 2.6, STEEL, toneI, .8, 16); // inner rod
+  s += box(CX-8, CY-8, ramZ-2, CX+8, CY+8, ramZ+3, GRAPH, toneI, .8);            // die block
+  s += box(CX-1.6, CY-1.6, ramZ-1.8, CX+1.6, CY+1.6, ramZ-0.4, BRASS, toneI, .5); // strike punch
+  return s;
+}
+
+function scene(st, m){
+  let s = castShadow([[0,0,0],[W,0,0],[W,D,0],[0,D,0]]);
+  let body = '';
+  // heavy beveled base
+  body += box(3, 3, 0, W-3, D-3, 5, STEEL, toneI, .8);
+  body += box(5, 5, 5, W-5, D-5, 6.5, DSTEEL, toneI, .6);
+  // anvil + polished die plate
+  body += box(CX-9, CY-9, 6.5, CX+9, CY+9, ANVIL_TOP, GRAPH, toneI, .8);
+  body += box(CX-7.5, CY-7.5, ANVIL_TOP, CX+7.5, CY+7.5, ANVIL_TOP+1.4, STEEL, toneI, .6);
+  // four columns with collars
+  for (const [x, y] of [[5,5],[W-5,5],[5,D-5],[W-5,D-5]]){
+    body += box(x-2, y-2, 5, x+2, y+2, H-9, STEEL, toneI, .8);
+    body += box(x-2.4, y-2.4, 5, x+2.4, y+2.4, 7, DSTEEL, toneI, .6);
+    body += box(x-2.4, y-2.4, H-9, x+2.4, y+2.4, H-7, BRASS, toneI, .6);
+  }
+  // crown
+  body += box(5, 5, H-9, W-5, D-5, H-6, STEEL, toneI, .8);
+  body += box(7, 7, H-6, W-7, D-7, H-4.5, DSTEEL, toneI, .6);
+  body += flywheel();
+  // pressure gauge (brass, no lettering)
+  body += cylX(CX+11, CX+14, CY+11, H-5.5, 3, BRASS, toneI, .7, 14);
+  body += ink(pd([ [CX+12.5, CY+11, H-2.5], [CX+12.5, CY+13, H-5.5], [CX+14, CY+11, H-5.5] ]), 1.2);
+  // ram
+  body += ram(st);
+  // coin seat + coin (milled edge + strike mark)
+  body += cyl(CX, CY, ANVIL_TOP+1.4, ANVIL_TOP+1.55, COIN_R+0.9, DSTEEL, toneI, .5, 24);
+  body += cyl(CX, CY, ANVIL_TOP+1.4, ANVIL_TOP+3.6, COIN_R, COIN, toneI, 1.1, 24);
+  body += shape(on(PZ(ANVIL_TOP+3.7), ellUV(CX, CY, COIN_R, COIN_R, 24)), COIN.m, 1);
+  body += ink(pd(on(PZ(ANVIL_TOP+3.7), ellUV(CX, CY, COIN_R-0.7, COIN_R-0.7, 24))), 1.1);
+  if (st.stamped) body += fill(pd(on(PZ(ANVIL_TOP+3.8), coinTop(0))), INK);
+  // blank feed chute (side) + eject chute
+  body += box(W-11, CY-3, H+1, W-4, CY+3, H+8, GRAPH, toneI, .6);
+  body += rod([W-7.5, CY, H-9], [W-7.5, CY, H+1], 2.4, STEEL, toneI, .5);
+
+  const k = ease(st.xr || 0);
+  if (k > 0) body = xrGhost(body, '', k, rectUV(0, 0, D, H), 0, W, m) + `<g opacity="${k}">${pressMech(st, k)}</g>`;
+  s += body;
+  return s;
+}
+
+let MECH_LABELS = '';
+function pressMech(st, k){
+  const parts = [];
+  const put = (b, svg) => parts.push({ box: b, svg });
+  const ramZ = H-9 - 33*st.ram;
+  put([[CX-2, CY-2, ramZ-2],[CX+2, CY+2, ramZ+2]], rod([CX, CY, ramZ], [CX, CY, ramZ], .5, STEEL, toneI, .2)
+    + box(CX-1.8, CY-1.8, ramZ-1.8, CX+1.8, CY+1.8, ramZ-0.4, BRASS, toneI, .5));
+  put([[CX-3, CY-3, H-3],[CX+3, CY+3, H+1]], flywheel());
+  put([[W-11, CY-3, H+1],[W-4, CY+3, H+8]], box(W-11, CY-3, H+1, W-4, CY+3, H+8, GRAPH, toneI, .6));
+  put([[CX-COIN_R-1, CY-COIN_R-1, ANVIL_TOP+1],[CX+COIN_R+1, CY+COIN_R+1, ANVIL_TOP+3.6]],
+    cyl(CX, CY, ANVIL_TOP+1.4, ANVIL_TOP+3.6, COIN_R, COIN, toneI, 1, 24)
+    + (st.stamped ? fill(pd(on(PZ(ANVIL_TOP+3.8), coinTop(0))), INK) : ''));
+  put([[CX+9, CY-3, 4],[W-2, CY+3, 8]], box(CX+9, CY-3, 4, W-2, CY+3, 8, GRAPH, toneI, .5));
+  for (let i = 0; i < Math.min(st.coins, 3); i++)
+    put([[W-6, CY-2.5, 4+i*2.4],[W-2, CY+2.5, 6+i*2.4]], cylX(W-6, W-2, CY, 5+i*2.4, 2.5, COIN, toneI, .7, 14));
+  MECH_LABELS = k <= .6 ? '' : xrCallouts([
+    { at:[CX, CY, ramZ+3], text:'RAM DIE', on: st.ram > .2 },
+    { at:[CX, CY, ANVIL_TOP+1], text:'ANVIL', on:false },
+    { at:[CX, CY, ANVIL_TOP+2], text:'TOKEN', on: st.stamped },
+    { at:[CX, CY, H-2], text:'FLYWHEEL', on: st.ram > 0 && st.ram < 1 },
+    { at:[W-7, CY, H+4], text:'BLANK FEED', on: st.phase !== 'idle' },
+    { at:[W-4, CY, 5], text:'OUT TRAY', on: st.coins > 0 },
+  ], [0, W+4, 0, D, -2, H+14]);
+  return byDepth(parts);
+}
+
+let ui, loopOn = false;
+function stepSim(st, now, dt){
+  if (st.phase === 'pressing'){
+    if (!st.hit && st.ram > .88){ st.hit = true; st.stamped = true; say(1); }
+    if (st.hit){ st.ram = Math.max(0, st.ram - dt/600); if (st.ram <= 0){ st.phase = 'done'; st.coins++; say(2); } }
+    else st.ram = Math.min(1, st.ram + dt/700);
+  }
+}
+function runLoop(){
+  if (loopOn) return; loopOn = true;
+  let last = performance.now();
+  ui.animate(() => { const st = ui.st, now = performance.now(), dt = Math.min(100, now-last); last = now;
+    stepSim(st, now, dt); const busy = st.phase === 'pressing'; if (!busy) loopOn = false; return busy; });
+}
+const STEPS = ['A blank drops onto the anvil.','The ram slams down and strikes the die.','The stamped token drops out — full supply minted in one strike.'];
+function say(i){ if (ui && STEPS[i]) ui.flash(STEPS[i], 2400); }
+function press(st){ if (st.phase === 'pressing') return; st.phase = 'pressing'; st.ram = 0; st.hit = false; st.t0 = performance.now(); say(0); runLoop(); }
+const pressCaption = st => st.phase === 'pressing' && !st.hit ? 'The ram slams down and strikes the die.' : st.phase === 'pressing' ? 'The token is struck.' : st.phase === 'done' ? 'The stamped token drops into the out tray.' : 'A blank drops, the ram strikes it, and a token falls out.';
+
+ui = mountFigure({
+  fig:'13', turn:'full', title:'The Press', hint:'Press (space) · drag to turn',
+  idea:'A hydraulic coin press that stamps a blank into a token — the machine that mints.',
+  size:[W+4, D, H+16], center:[W/2+2, D/2], palette:'mustard',
+  state:{ phase:'idle', t0:0, ram:0, hit:false, stamped:false, coins:0 },
+  scene,
+  readout: st => st.phase === 'pressing' ? (st.hit ? 'striking the token' : 'ram coming down') : st.phase === 'done' ? 'token stamped · supply minted' : 'ready · press to mint',
+  buttons:[ { label:'Press', onClick: press } ],
+  acts:{},
+  params:(st, q) => { if (q.has('ram')) st.ram = +q.get('ram'); if (q.has('stamped')) st.stamped = q.get('stamped') === '1'; if (q.has('coins')) st.coins = +q.get('coins') | 0; },
+});
+window.pressMachine = () => { const st = ui.st; st.phase = 'pressing'; st.ram = 0; st.hit = false; st.stamped = false; st.t0 = performance.now(); runLoop(); };
+addEventListener('keydown', e => {
+  if (/input|textarea|button/i.test(e.target.tagName)) return;
+  if (e.key === ' ' || e.key === 'Enter'){ press(ui.st); e.preventDefault(); ui.render(); }
+});
+xrMount(() => ui, pressCaption);
+</script></body></html>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Vault</title>
+<style>
+  h1, h2, h3, #btns, .ctl, .pals, .vset, .vrow, .lblctl, .lgd, .zchip,
+  footer, .made-with, .toast, .stepwrap, .readout, .mcap { display: none !important; }
+  body { margin: 0; }
+  .stage { margin: 0 !important; }
+</style>
+</head><body>
+<script src="core.js"></script>
+<script>
+/* CRUCIBLE — The Vault. When the curve completes, liquidity locks here and seeds the Uniswap v4 pool. */
+const W = 40, D = 40, H = 40;
+const CX = W/2, CY = D/2, CZ = H/2;
+const STEEL = { l:'#d8dcdf', m:'#a8aeb4', d:'#52585e' };
+const DSTEEL = { l:'#7d848c', m:'#5c6269', d:'#2f343a' };
+const GRAPH = { l:'#3c4046', m:'#2a2d32', d:'#16181b' };
+const BRASS = { l:'#e6c15a', m:'#c29a34', d:'#6e5518' };
+const GOLD = { l:'#f2c14e', m:'#d49c1f', d:'#7a5a10' };
+const DOOR_R = 12.5, BOLT_N = 8;
+
+function bolts(st){
+  const r = 14.5 - 4 * (st.lock || 0);
+  let s = '';
+  for (let i = 0; i < BOLT_N; i++){
+    const a = i / BOLT_N * 2 * Math.PI;
+    const y = CY + r * Math.sin(a), z = CZ + r * Math.cos(a);
+    s += cylX(W-0.7, W+0.9, y, z, 2, BRASS, toneI, .5, 10);
+  }
+  return s;
+}
+function spokedWheel(){
+  let s = cylX(W-0.4, W+0.8, CY, CZ, 6, STEEL, toneI, .8, 22);
+  s += cylX(W-0.3, W+0.9, CY, CZ, 1.6, BRASS, toneI, .7, 12);
+  for (let i = 0; i < 4; i++){
+    const a = i/4*2*Math.PI, y = CY+Math.sin(a)*5.5, z = CZ+Math.cos(a)*5.5;
+    s += rod([W+0.4, CY, CZ], [W+0.4, y, z], 0.9, STEEL, toneI, .5);
+  }
+  return s;
+}
+function dial(){
+  let s = cylX(W-0.3, W+0.6, CY, CZ-9.5, 2.8, BRASS, toneI, .7, 16);
+  for (let i = 0; i < 8; i++){
+    const a = i/8*2*Math.PI;
+    s += ink(pd([[W+0.6, CY+Math.sin(a)*2.2, CZ-9.5+Math.cos(a)*2.2],[W+0.6, CY+Math.sin(a)*2.7, CZ-9.5+Math.cos(a)*2.7]]), 0.9);
+  }
+  return s;
+}
+function door(){
+  let s = cylX(W-1.9, W-1.5, CY, CZ, DOOR_R+2.2, GRAPH, toneI, .5, 28);   // recessed well
+  s += cylX(W-1.5, W-0.2, CY, CZ, DOOR_R, DSTEEL, toneI, 1.1, 28);        // door body
+  s += cylX(W-1.5, W-0.2, CY, CZ, DOOR_R-1.8, STEEL, toneI, .8, 26);      // inner panel
+  s += ink(pd(on(PX(W-0.15), ellUV(CY, CZ, DOOR_R, DOOR_R, 32))), 1.2);   // door seam
+  s += cylX(W-0.5, W-0.1, CY, CZ, DOOR_R+1.2, BRASS, toneI, .5, 28);      // brass trim
+  return s;
+}
+function hinges(){
+  let s = '';
+  for (const z of [CZ-7, CZ+7])
+    s += box(W-2.5, CY-DOOR_R-1.4, z-1.4, W-0.5, CY-DOOR_R+1.4, z+1.4, STEEL, toneI, .6);
+  return s;
+}
+
+function scene(st, m){
+  let s = castShadow([[0,0,0],[W,0,0],[W,D,0],[0,D,0]]);
+  let body = '';
+  // plinth + body
+  body += box(0, 0, 0, W, D, 2, DSTEEL, toneI, .6);
+  body += box(1, 1, 2, W-1, D-1, H-1, STEEL, toneI, .85);
+  // corner reinforcement plates
+  for (const [x, y] of [[0.3,0.3],[W-3,0.3],[0.3,D-3],[W-3,D-3]])
+    body += box(x, y, 2, x+2.7, y+2.7, H-1, DSTEEL, toneI, .6);
+  // brass rivets on the two front-facing corner plates
+  for (const y0 of [1.2, D-1.5])
+    for (const z of [4.5, H-4.5])
+      body += cylX(W-0.3, W+0.2, y0, z, 0.55, BRASS, toneI, .4, 8);
+  body += hinges();
+  body += bolts(st);
+  body += door();
+  body += spokedWheel();
+  body += dial();
+
+  const k = ease(st.xr || 0);
+  if (k > 0) body = xrGhost(body, '', k, rectUV(0, 0, D, H), 0, W, m) + `<g opacity="${k}">${vaultMech(st, k)}</g>`;
+  s += body;
+  return s;
+}
+let MECH_LABELS = '';
+function vaultMech(st, k){
+  const parts = [];
+  const put = (b, svg) => parts.push({ box: b, svg });
+  put([[6, 6, 4],[W-6, D-6, H-6]], box(6, 6, 4, W-6, D-6, H-6, GOLD, toneI, .6));
+  put([[8, 8, 5],[W-8, D-8, H-8]], box(8, 8, 5, W-8, D-8, H-8, { l:'#ffe08a', m:'#f0c24d', d:'#8a6a18' }, toneI, .7));
+  const r = 14.5 - 4 * (st.lock || 0);
+  for (let i = 0; i < BOLT_N; i++){
+    const a = i/BOLT_N*2*Math.PI, y = CY + r*Math.sin(a), z = CZ + r*Math.cos(a);
+    put([[W-1, y-1.5, z-1.5],[W+1, y+1.5, z+1.5]], cylX(W-0.7, W+0.9, y, z, 2, BRASS, toneI, .5, 10));
+  }
+  put([[W-1.6, CY-DOOR_R, CZ-DOOR_R],[W-0.2, CY+DOOR_R, CZ+DOOR_R]], door());
+  put([[W-0.4, CY-7, CZ-7],[W+0.9, CY+7, CZ+7]], spokedWheel());
+  put([[W-0.3, CY-4, CZ-12],[W+0.6, CY+4, CZ-7]], dial());
+  MECH_LABELS = k <= .6 ? '' : xrCallouts([
+    { at:[CX, CY, CZ], text:'LIQUIDITY LOCKED', on:true },
+    { at:[W, CY, CZ], text:'VAULT DOOR', on:false },
+    { at:[W, CY, CZ+9], text:'LOCKING BOLTS', on: st.lock > 0 },
+  ], [0, W+4, 0, D, -2, H+14]);
+  return byDepth(parts);
+}
+
+let ui, loopOn = false;
+function stepSim(st, now, dt){
+  if (st.lock > 0 && st.lock < 1){
+    st.lock = Math.min(1, st.lock + dt/700);
+    if (st.lock >= 1) st.sealed = true;
+  }
+}
+function runLoop(){
+  if (loopOn) return; loopOn = true;
+  let last = performance.now();
+  ui.animate(() => { const st = ui.st, now = performance.now(), dt = Math.min(100, now-last); last = now;
+    stepSim(st, now, dt); const busy = st.lock > 0 && st.lock < 1; if (!busy) loopOn = false; return busy; });
+}
+function lock(st){ if (st.lock > 0 && st.lock < 1) return; st.lock = 0.001; runLoop(); }
+const vaultCaption = st => st.lock > 0 && st.lock < 1 ? 'The bolts slide in and the door seals.' : 'The completed liquidity locks inside and seeds the Uniswap v4 pool.';
+
+ui = mountFigure({
+  fig:'15', turn:'full', title:'The Vault', hint:'Click to lock · drag to turn',
+  idea:'A vault that locks completed liquidity and graduates it to Uniswap v4.',
+  size:[W+4, D, H+14], center:[W/2+2, D/2], palette:'mustard',
+  state:{ lock:0, sealed:false },
+  scene,
+  readout: st => st.lock > 0 && st.lock < 1 ? 'sealing the vault' : (st.sealed ? 'liquidity sealed · graduating' : 'ready'),
+  buttons:[ { label:'Lock', onClick: lock } ],
+  acts:{},
+  params:(st, q) => { if (q.has('lock')) st.lock = +q.get('lock'); if (q.has('sealed')) st.sealed = q.get('sealed') === '1'; },
+});
+window.lockVault = () => { lock(ui.st); };
+document.querySelector('.stage').addEventListener('click', () => { lock(ui.st); ui.render(); });
+addEventListener('keydown', e => {
+  if (/input|textarea|button/i.test(e.target.tagName)) return;
+  if (e.key === ' ' || e.key === 'Enter'){ lock(ui.st); e.preventDefault(); ui.render(); }
+});
+xrMount(() => ui, vaultCaption);
+</script></body></html>
