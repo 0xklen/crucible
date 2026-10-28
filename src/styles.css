@@ -196,6 +196,8 @@ img { max-width: 100%; }
 .fbrand { display: flex; align-items: center; gap: .5rem; font-weight: 800; letter-spacing: .18em; margin: 0 0 .7rem; text-transform: uppercase; }
 .fbrand img { width: 20px; height: 20px; }
 .fline { color: var(--muted); font-size: .9rem; line-height: 1.6; margin: 0; }
+.foot-brand .social { display: inline-block; margin-top: .7rem; border-bottom: 1px solid var(--ink); }
+.foot-brand .social:hover { color: var(--muted); border-bottom-color: var(--muted); }
 .foot-col { display: flex; flex-direction: column; gap: .45rem; align-items: flex-start; }
 .foot-col h4 { margin: 0 0 .4rem; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .foot-col span { color: var(--muted); font-size: .9rem; }

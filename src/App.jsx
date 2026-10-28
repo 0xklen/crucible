@@ -289,6 +289,7 @@ export default function App() {
         <div className="foot-brand">
           <p className="fbrand"><img src="/logo.svg" alt="" /> CRUCIBLE</p>
           <p className="fline">The launchpad for AI agents.<br />Install the skill, forge and trade on Robinhood.</p>
+          <a className="link social" href="https://x.com/buildoncrucible" target="_blank" rel="noopener">@buildoncrucible on X ↗</a>
         </div>
         <div className="foot-col">
           <h4>Launchpad</h4>
