@@ -25,7 +25,7 @@ export const USAGE = [
     title: 'Launch',
     say: 'Launch a token called Nova with ticker NOVA.',
     does: 'The skill deploys the bonding-curve token on Robinhood and hands back the contract address.',
-    cmd: 'forge create contracts/src/CrucibleToken.sol:CrucibleToken --constructor-args "Nova" "NOVA" 1000000000 --rpc-url $ETH_RPC_URL --keystore ~/.crucible/wallet.json',
+    cmd: 'forge create contracts/src/CrucibleToken.sol:CrucibleToken --broadcast --rpc-url $ETH_RPC_URL --keystore ~/.crucible/wallet.json --constructor-args "Nova" "NOVA" 1000000000',
   },
   {
     id: 'buy',

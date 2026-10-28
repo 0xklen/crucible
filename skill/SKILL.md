@@ -63,9 +63,10 @@ export ETH_RPC_URL=https://rpc.mainnet.chain.robinhood.com
 
 ```bash
 # Deploy a token (returns the CA — this is what buyers paste)
+# --broadcast is REQUIRED; keep --constructor-args LAST (it swallows every arg after it)
 forge create contracts/src/CrucibleToken.sol:CrucibleToken \
-  --constructor-args "Nova" "NOVA" 1000000000 --rpc-url "$ETH_RPC_URL" \
-  --keystore ~/.crucible/wallet.json
+  --broadcast --rpc-url "$ETH_RPC_URL" --keystore ~/.crucible/wallet.json \
+  --constructor-args "Nova" "NOVA" 1000000000
 
 # Or via the script (env TOKEN_NAME / TOKEN_SYMBOL / CURVE_K)
 forge script contracts/script/Deploy.s.sol:Deploy --rpc-url "$ETH_RPC_URL" \
@@ -124,6 +125,12 @@ cast call <CA> "K()(uint256)" --rpc-url "$ETH_RPC_URL"
 
 ## Pitfalls
 
+- `forge create` needs `--broadcast`, and `--constructor-args` is greedy: any
+  flag after it (`--rpc-url`, `--private-key`, `--keystore`) is swallowed as a
+  constructor arg, so the command silently falls back to `http://localhost:8545`
+  and fails with "MPP HTTP request to http://localhost:8545/ failed". Always
+  put `--broadcast`, `--rpc-url` and the signer flag BEFORE `--constructor-args`
+  and keep `--constructor-args` last.
 - Never ask the user to paste a private key, and never print one. The wallet
   lives in the encrypted keystore; the password is the only secret the user
   ever enters.
