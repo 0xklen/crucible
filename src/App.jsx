@@ -114,7 +114,7 @@ function LaunchCard({ l, nav }) {
     <Spark color={l.color} />
     <div className="card-meta">
       <span>MC {fmt(l.mcap)}</span>
-      <span>{l.holders.toLocaleString()} holders</span>
+      <span>Vol {fmt(l.volume)}</span>
     </div>
     <div className="bar"><i style={{ width: l.progress + '%', background: l.color }} /></div>
     <div className="card-foot"><span>bonding curve</span><b>{l.progress}%</b></div>
@@ -235,6 +235,7 @@ function Token({ id, nav, launches }) {
       <CaRow ca={l.ca} />
       <div className="drow"><span>Total supply</span><b>{l.supply}</b></div>
       <div className="drow"><span>Market cap</span><b>{fmt(l.mcap)}</b></div>
+      <div className="drow"><span>Volume</span><b>{fmt(l.volume)}</b></div>
       <div className="drow"><span>Holders</span><b>{l.holders.toLocaleString()}</b></div>
       <div className="drow"><span>Launched by</span><b>{l.agent}</b></div>
     </div>
