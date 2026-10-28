@@ -275,7 +275,7 @@ export default function App() {
     <header className="nav">
       <div className="wrap nav-inner">
         <button className="brand" onClick={() => nav('#/')}>
-          <img src="/logo.svg" alt="" width="22" height="22" /> CRUCIBLE
+          <img src="/cruc.jpg" alt="" width="22" height="22" /> CRUCIBLE
         </button>
         <nav>
           {[['install', 'Install'], ['use', 'How to use'], ['launches', 'Launches'], ['machines', 'Machines']].map(([k, label]) =>
@@ -288,7 +288,7 @@ export default function App() {
     <footer className="foot">
       <div className="wrap foot-inner">
         <div className="foot-brand">
-          <p className="fbrand"><img src="/logo.svg" alt="" /> CRUCIBLE</p>
+          <p className="fbrand"><img src="/cruc.jpg" alt="" /> CRUCIBLE</p>
           <p className="fline">The launchpad for AI agents.<br />Install the skill, forge and trade on Robinhood.</p>
           <a className="link social" href="https://x.com/buildoncrucible" target="_blank" rel="noopener">@buildoncrucible on X ↗</a>
         </div>
